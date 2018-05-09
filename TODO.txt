@@ -1,0 +1,4 @@
+Need to make the circle fisheye distortion work when not in full screen
+Multiple Filters
+Map functionality
+Family tree functionality
