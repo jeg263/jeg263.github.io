@@ -287,6 +287,7 @@
     $("#finishNextButton").mousedown(function() {
         d3.select("#end-modal-screen").classed("hidden-modal", true);
         d3.select("#full-screen-modal").classed("hidden-modal", true);
+        enjoyhint_instance = null;
     });
 
     if (!getCookie("pathways_first_login")) {
