@@ -258,12 +258,7 @@
 <script src="dependencies/enjoyhint.js"></script>
 <script type="text/javascript" src="js/map.js"></script>
 <script>
-    var enjoyhint_instance = new EnjoyHint({
-        onEnd: function() {
-            d3.select("#end-modal-screen").classed("hidden-modal", false);
-            d3.select("#full-screen-modal").classed("hidden-modal", false);
-        }
-    });
+    var enjoyhint_instance;
     function getCookie(name) {
         var dc = document.cookie;
         var prefix = name + "=";
@@ -291,6 +286,16 @@
     });
 
     if (!getCookie("pathways_first_login")) {
+        enjoyhint_instance = new EnjoyHint({
+            onEnd: function() {
+                enjoyhint_instance = null;
+                d3.select("#end-modal-screen").classed("hidden-modal", false);
+                d3.select("#full-screen-modal").classed("hidden-modal", false);
+            },
+            onSkip: function () {
+                enjoyhint_instance = null;
+            }
+        });
         d3.select("#welcome-modal-screen").classed("hidden-modal", false);
         d3.select("#full-screen-modal").classed("hidden-modal", false);
     }
