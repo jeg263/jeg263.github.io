@@ -124,8 +124,28 @@ function controllerMain() {
             chord.refreshVisualization(null, true);
         });
         $("#resetButton").click(function () {
-            chord.multiplier = 0.9;
-            chord.refreshVisualization(null, true);
+            // chord.multiplier = 0.9;
+            selectPersonSearchTerm = "";
+            familySearchTerm = "";
+            ageSearchTerm = "";
+            ageFilterOption = "greaterThan";
+            plantationFilterOption = "any";
+            buyerFilterOption = "any";
+            genderFilterOption = "any";
+            filterKatharineJackson = false;
+            $("#inputAge").val("");
+            $("#inputFamily").val("");
+            $("#selectPerson").val("");
+            $("#dropdownBuyerButton").html("Any");
+            $("#dropdownGenderButton").html("Any");
+            $("#dropdownMenuButton").html("Greater than");
+            $("#dropdownPlantationButton").html("Any");
+
+            controller.deselectEnslavedPerson();
+            var combinedFilter = getCombinedFilter();
+            chord.refreshVisualization(combinedFilter);
+            updateFilterConditionsForSelect();
+
         });
         $('#inputAge').keyup(function(){
             ageSearchTerm = $("#inputAge").val();
