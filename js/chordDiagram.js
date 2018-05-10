@@ -1,8 +1,12 @@
-var chord = {originalData: null, showOtherData: true, multiplier: 0.9};
+var chord = {originalData: null, showOtherData: true, magnifyNamesConditionBox: true, multiplier: 0.9};
 
 function chordDiagramMain() {
     //view variables
     var div;
+
+    chord.getAllData = function () {
+        return allData;
+    };
 
     //data variables
     var allData; //fully processed data to build visualization on
@@ -36,6 +40,10 @@ function chordDiagramMain() {
 
     //launch visualization
     $(document).ready(function() {
+        var radius = ($("#left-container").width()) / 1.88;
+        chord.multiplier = (2 * radius) / wReal;
+        updateVariables();
+
         //create fisheye distortion variables
         var fisheyeRadius = 50;
         var fisheyeDistortionFactor = 2;
@@ -61,6 +69,7 @@ function chordDiagramMain() {
                 resetCSVData();
                 refreshVisualization(null, true);
                 controller.onDataLoad();
+                controller.didUpdateMultiplier();
                 // d3v2.select("#mapContainer").classed("hidden", true);
                 // d3v2.select("#mapContainer").classed("opacity0", true);
             }
@@ -90,28 +99,40 @@ function chordDiagramMain() {
         allData = dataForVisualization;
         constructVisualization(allData);
 
-        if (chord.showOtherData) {
-            if (chord.multiplier < 0.8) {
-                div.select("#svgTop").classed("very-small", false).classed("super-small", false).classed("super-super-small", true);
-            }
-            else if (chord.multiplier < 0.9) {
-                div.select("#svgTop").classed("very-small", false).classed("super-small", true).classed("super-super-small", false);
-            }
-            else {
-                div.select("#svgTop").classed("very-small", true).classed("super-small", false).classed("super-super-small", false);
-            }
-        }
-        else {
-            if (chord.multiplier < 0.8) {
-                div.select("#svgTop").classed("small", false).classed("very-small", true);
-            }
-            else if (chord.multiplier < 0.9) {
-                div.select("#svgTop").classed("small", true).classed("very-small", false);
-            }
-            else {
-                div.select("#svgTop").classed("small", false).classed("very-small", false);
-            }
-        }
+        // if (chord.showOtherData) {
+        //     if (chord.multiplier < 0.6) {
+        //         div.select("#svgTop").classed("very-small", false).classed("super-small", false).classed("super-super-small", true).classed("super-super-tiny-small", false).classed("could-not-be-smaller", true);
+        //     }
+        //     if (chord.multiplier < 0.7) {
+        //         div.select("#svgTop").classed("very-small", false).classed("super-small", false).classed("super-super-small", true).classed("super-super-tiny-small", true).classed("could-not-be-smaller", false);
+        //     }
+        //     if (chord.multiplier < 0.8) {
+        //         div.select("#svgTop").classed("very-small", false).classed("super-small", false).classed("super-super-small", true).classed("super-super-tiny-small", false).classed("could-not-be-smaller", false);
+        //     }
+        //     else if (chord.multiplier < 0.9) {
+        //         div.select("#svgTop").classed("very-small", false).classed("super-small", true).classed("super-super-small", false).classed("super-super-tiny-small", false).classed("could-not-be-smaller", false);
+        //     }
+        //     else {
+        //         div.select("#svgTop").classed("very-small", true).classed("super-small", false).classed("super-super-small", false).classed("super-super-tiny-small", false).classed("could-not-be-smaller", false);
+        //     }
+        // }
+        // else {
+        //     if (chord.multiplier < 0.6) {
+        //         div.select("#svgTop").classed("small", false).classed("very-small", false).classed("super-super-small", false).classed("super-super-tiny-small", true);
+        //     }
+        //     if (chord.multiplier < 0.7) {
+        //         div.select("#svgTop").classed("small", false).classed("very-small", false).classed("super-super-small", true).classed("super-super-tiny-small", false);
+        //     }
+        //     if (chord.multiplier < 0.8) {
+        //         div.select("#svgTop").classed("small", false).classed("very-small", true).classed("super-super-small", false).classed("super-super-tiny-small", false);
+        //     }
+        //     else if (chord.multiplier < 0.9) {
+        //         div.select("#svgTop").classed("small", true).classed("very-small", false).classed("super-super-small", false).classed("super-super-tiny-small", false);
+        //     }
+        //     else {
+        //         div.select("#svgTop").classed("small", false).classed("very-small", false).classed("super-super-small", false).classed("super-super-tiny-small", false);
+        //     }
+        // }
     }
     function processData(rawData) {
         var json = rawData.map(function (obj) {
@@ -247,8 +268,14 @@ function chordDiagramMain() {
                     else if (!chord.showOtherData && counter > 6) {
                         return "none";
                     }
-                    else {
+                    else if (chord.multiplier > 0.8) {
                         return "arc-label"
+                    }
+                    else if (chord.multiplier > 0.65) {
+                        return "arc-label small-arc-label"
+                    }
+                    else if (chord.multiplier <= 0.65) {
+                        return "arc-label very-small-arc-label"
                     }
                 })
                 .attr("x", 15)   //Move the text from the start angle of the arc
@@ -301,77 +328,94 @@ function chordDiagramMain() {
                 .on("mouseover", mouseover)
                 .on("mouseout", mouseout);
         }
+        var isFocusedAtCenter = false;
         function animateWith(obj) {
-            var angleDeg;
-            focusFishEyes();
-            animateGroupHeaders();
-            animateLinkLines();
-            animateTextNodes();
+            if (chord.magnifyNamesConditionBox || !isFocusedAtCenter) {
+                var angleDeg;
+                focusFishEyes();
+                animateGroupHeaders();
+                animateLinkLines();
+                animateTextNodes();
+            }
+            else {
+                textNodes.each(function () {
+                    
+                }).classed("target", function (d) {
+                    return d.data.id === hoveredKey
+                });
+            }
 
             function focusFishEyes() {
-                //mouse position
-                var mouseX = d3v2.mouse(obj)[0];
-                var mouseY = d3v2.mouse(obj)[1];
-                var radius = ry - 180;
+                if (chord.magnifyNamesConditionBox) {
+                    isFocusedAtCenter = false;
+                    //mouse position
+                    var mouseX = d3v2.mouse(obj)[0];
+                    var mouseY = d3v2.mouse(obj)[1];
+                    var radius = ry - 180;
 
-                //center point of svg
-                var centerX = 0;
-                var centerY = 0;
+                    //center point of svg
+                    var centerX = 0;
+                    var centerY = 0;
 
-                //re calculate mouse position in div to be position in svg
-                var divWidth = $(obj).width();
-                if (mouseX > divWidth / 2) {
-                    mouseX = mouseX - divWidth / 2;
+                    //re calculate mouse position in div to be position in svg
+                    var divWidth = $(obj).width();
+                    if (mouseX > divWidth / 2) {
+                        mouseX = mouseX - divWidth / 2;
+                    }
+                    else {
+                        mouseX = -1 * (divWidth / 2 - mouseX);
+                    }
+                    var divHeight = $(obj).height();
+                    if (mouseY > divHeight / 2) {
+                        mouseY = mouseY - divHeight / 2;
+                    }
+                    else {
+                        mouseY = -1 * (divHeight / 2 - mouseY);
+                    }
+
+                    //calculate mouse position in svg to be angle around center and distance from center
+                    var diffX = mouseX - centerX;
+                    var diffY = mouseY - centerY;
+                    var angle = Math.atan2(diffY, diffX);
+
+                    angleDeg = toDegrees(angle); //+ 90;
+                    if (angleDeg < 0)
+                        angleDeg = 180 + 180 - (-1 * angleDeg);
+
+                    angleDeg += 90;
+                    if (angleDeg > 360)
+                        angleDeg -= 360;
+
+
+
+                    var fisheyeY = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) - 21;
+
+                    if (fisheyeY > (radius + 120)) {
+                        fisheyeY = 0;
+                    }
+                    else if (fisheyeY > (radius - 7)) {
+                        fisheyeY = radius
+                    }
+                    else {
+                        fisheyeY = 0;
+                    }
+
+                    //calculate negAngleDeg if near the top of circle (0 deg or around 360 deg)
+                    var negAngleDeg = angleDeg;
+                    if (negAngleDeg > 270)
+                        negAngleDeg = -1 * (360 - angleDeg);
+                    else if (negAngleDeg < 90) {
+                        negAngleDeg = 360 + negAngleDeg;
+                    }
+                    //focus distortion around mouse position
+                    fisheyeNegative.focus([negAngleDeg, fisheyeY]);
+                    fisheye.focus([angleDeg, fisheyeY]);
                 }
                 else {
-                    mouseX = -1 * (divWidth / 2 - mouseX);
+                    isFocusedAtCenter = true;
+                    fisheyeNegative.focus([0, 0]);
+                    fisheye.focus([0, 0]);
                 }
-                var divHeight = $(obj).height();
-                if (mouseY > divHeight / 2) {
-                    mouseY = mouseY - divHeight / 2;
-                }
-                else {
-                    mouseY = -1 * (divHeight / 2 - mouseY);
-                }
-
-                //calculate mouse position in svg to be angle around center and distance from center
-                var diffX = mouseX - centerX;
-                var diffY = mouseY - centerY;
-                var angle = Math.atan2(diffY, diffX);
-
-                angleDeg = toDegrees(angle); //+ 90;
-                if (angleDeg < 0)
-                    angleDeg = 180 + 180 - (-1 * angleDeg);
-
-                angleDeg += 90;
-                if (angleDeg > 360)
-                    angleDeg -= 360;
-
-
-
-                var fisheyeY = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) - 21;
-
-                if (fisheyeY > (radius + 120)) {
-                    fisheyeY = 0;
-                }
-                else if (fisheyeY > (radius - 7)) {
-                    fisheyeY = radius
-                }
-                else {
-                    fisheyeY = 0;
-                }
-
-                //calculate negAngleDeg if near the top of circle (0 deg or around 360 deg)
-                var negAngleDeg = angleDeg;
-                if (negAngleDeg > 270)
-                    negAngleDeg = -1 * (360 - angleDeg);
-                else if (negAngleDeg < 90) {
-                    negAngleDeg = 360 + negAngleDeg;
-                }
-
-                //focus distortion around mouse position
-                fisheyeNegative.focus([negAngleDeg, fisheyeY]);
-                fisheye.focus([angleDeg, fisheyeY]);
             }
             function animateGroupHeaders() {
                 function findFisheyeStartAngle(children) {
@@ -458,20 +502,77 @@ function chordDiagramMain() {
             }
         }
         function getFontSizeForTextWith(d) {
+            var initialFontSize = 5;
+
+            if (chord.showOtherData) {
+                if (chord.multiplier < 0.6) {
+                    initialFontSize = 1
+                }
+                if (chord.multiplier < 0.7) {
+                    initialFontSize = 2
+                }
+                if (chord.multiplier < 0.8) {
+                    initialFontSize = 3;
+                }
+                else if (chord.multiplier < 0.9) {
+                    initialFontSize = 4;
+                }
+                else {
+                    initialFontSize = 5;
+                }
+            }
+            else {
+                if (chord.multiplier < 0.6) {
+                    initialFontSize = 2
+                }
+                if (chord.multiplier < 0.7) {
+                    initialFontSize = 3
+                }
+                if (chord.multiplier < 0.8) {
+                    initialFontSize = 4;
+                }
+                else if (chord.multiplier < 0.9) {
+                    initialFontSize = 5;
+                }
+                else {
+                    initialFontSize = 6;
+                }
+            }
+
+
             if (!d.fisheye)
-                return 5;
+                return initialFontSize;
             else {
                 if (d.fisheye.z - 1 > 0.8)
-                    return 10;
+                    return initialFontSize + 5;
                 else if (d.fisheye.z - 1 > 0.6)
-                    return 7;
+                    return initialFontSize + 2;
                 else if (d.fisheye.z - 1 > 0.3)
-                    return 5;
-                else if (d.fisheye.z - 1 > 0)
-                    return 3;
+                    return initialFontSize;
+                else if (d.fisheye.z - 1 > 0) {
+                    if (initialFontSize < 3)
+                        return 1;
+                    else
+                        return initialFontSize - 2;
+                }
                 else
-                    return 5
+                    return initialFontSize;
             }
+
+            // if (!d.fisheye)
+            //     return 5;
+            // else {
+            //     if (d.fisheye.z - 1 > 0.8)
+            //         return 10;
+            //     else if (d.fisheye.z - 1 > 0.6)
+            //         return 7;
+            //     else if (d.fisheye.z - 1 > 0.3)
+            //         return 5;
+            //     else if (d.fisheye.z - 1 > 0)
+            //         return 3;
+            //     else
+            //         return 5
+            // }
         }
         function toDegrees (angle) {
             return angle * (180 / Math.PI);
@@ -490,23 +591,23 @@ function chordDiagramMain() {
 
         function mouseover(d) {
             hoveredKey = d.key;
-            // console.log(d.key);
-            // svg.selectAll("path.link.target-" + d.key)
-            //     .classed("target", true)
-            //     .each(updateNodes("source", "target", true));
-            // svg.selectAll("path.link.source-" + d.key)
-            //     .classed("source", true)
-            //     .each(updateNodes("target", "target", true));
+            if (!chord.magnifyNamesConditionBox) {
+                // console.log(d.key);
+                svg.selectAll("path.link.target-" + d.key)
+                    .classed("target", true);
+                svg.selectAll("path.link.source-" + d.key)
+                    .classed("source", true);
+            }
         }
 
         function mouseout(d) {
             hoveredKey = null;
-            // svg.selectAll("path.link.source-" + d.key)
-            //     .classed("source", false)
-            //     .each(updateNodes("target", "target", false));
-            // svg.selectAll("path.link.target-" + d.key)
-            //     .classed("target", false)
-            //     .each(updateNodes("source", "target", false));
+            if (!chord.magnifyNamesConditionBox) {
+                svg.selectAll("path.link.source-" + d.key)
+                    .classed("source", false);
+                svg.selectAll("path.link.target-" + d.key)
+                    .classed("target", false);
+            }
         }
         function deselectNode() {
             var d = currentNode;

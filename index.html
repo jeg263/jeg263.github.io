@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+Double+Pica|IM+Fell+English+SC" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="./css/enjoyhint.css" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="./dependencies/jquery.fullpage.css">
 </head>
 <body>
@@ -26,13 +27,39 @@
 <script type="text/javascript">
 
 </script>
+<div id="welcome-modal-screen" class="welcome-modal-screen hidden-modal">
+    <div style="width: 100%; top: 30%; position: relative; text-align: center">
+        <label class="welcome-title">Welcome to Pathways</label>
+        <div style="width: 70%; margin: auto">
+            <label style="text-align: justify">This appears to be your fist time using the Pathways data visualization. It provides a digital tool for exploring data on the GU272. Before getting started however, follow this brief walkthrough to discover the functionality within it.</label>
+        </div>
+        <div style="width: 100%; text-align: center; margin-top: 20px"><div class="enjoyhint_next_btn" style="display: inline-block; position: static;" id="welcomeNextButton">
+            Continue
+        </div></div>
+    </div>
+</div>
+<div id="end-modal-screen" class="welcome-modal-screen hidden-modal">
+    <div style="width: 100%; top: 30%; position: relative; text-align: center">
+        <label class="welcome-title">Walkthrough Complete</label>
+        <div style="width: 70%; margin: auto">
+            <label style="text-align: justify">You have reached the end of the feature walkthrough for the Pathways data visualization. From here you are free to explore the GU272 data.</label>
+        </div>
+        <div style="width: 100%; text-align: center; margin-top: 20px">
+            <div class="enjoyhint_next_btn" style="display: inline-block; position: static; content: 'Finish'" id="finishNextButton">
+                Finish
+            </div>
+        </div>
+    </div>
+</div>
+<div id="full-screen-modal" class="full-screen-modal hidden-modal"></div>
 <div id="fullpage">
     <div id="header" class="header-bar" style="display: block">
         <a href="#home" style="color: white; display: inline-block; float: left; margin-top: 3px; margin-left: 20px">
-            <div class="header-bar-title" style="display: inline-block; float: left; margin-top: 3px;">GU</div>
-            <div class="header-bar-title" style="display: inline-block; float: left; margin-top: -3px;">272</div>
-            <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-top: 9px; margin-left: 5px; font-size: 18px;">DIGITAL EXPLORER</div>-->
-            <div class="header-bar-title" style="display: inline-block; float: left; margin-left: 7px; margin-top: 9px; font-size: 22px;">DIGITAL EXPLORER</div>
+            <div class="header-bar-title" style="display: inline-block; float: left; margin-left: 7px; margin-top: 9px; font-size: 22px;">Pathways: GU272 Data Explorer</div>
+            <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-top: 3px;">GU</div>-->
+            <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-top: -3px;">272</div>-->
+            <!--&lt;!&ndash;<div class="header-bar-title" style="display: inline-block; float: left; margin-top: 9px; margin-left: 5px; font-size: 18px;">DIGITAL EXPLORER</div>&ndash;&gt;-->
+            <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-left: 7px; margin-top: 9px; font-size: 22px;">PATHWAYS</div>-->
         </a>
     </div>
     <div class="section">
@@ -53,15 +80,22 @@
             <!--height: calc(100VH - 50px)-->
             <div id="left-container" class="stage-shrink" style="float: left; width: 60%; height: 100%; border-top: 1px #eceef1 solid; overflow: scroll;">
                 <div id="mapContainer" class="opacity0" style="width: 100%; height: 100%; text-align: center; position:relative;">
-                    <div style="height: 553px; width: 600px; overflow: visible; display: inline-block; position: absolute;margin: auto;top: 0;right: 0;bottom: 0;left: 0;">
+                    <div id="noMapData" class="no-map-data-container">
+                        <label class="no-map-data-label">Choose an enslaved person to view on the map where the Jesuits sold the person</label>
+                    </div>
+                    <label id="mapOtherLabel" class="map-other-label hidden-other-label">
+                        No buyer data
+                    </label>
+                    <div id="mapBox" style="height: 553px; width: 600px; overflow: visible; display: inline-block; position: absolute;margin: auto;top: 0;right: 0;bottom: 0;left: 0;">
                         <div id="history" class="page" style="width: 100%; height: 1630px">
-                            <div id="map" class="fixed" style="width: 100%; height: 100%; float: left;"></div>
+                            <div id="map" class="fixed" style="width: 100%; height: 100%; float: left;">
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div id="bundle" style="position: relative; min-width: 100%; display: inline-block"></div>
             </div>
-            <div id="right-container" class="right-container stage-open">
+            <div id="right-container" class="right-container stage-open" style="overflow: scroll">
 
                 <div id="move-button" class="arrow-container">
                     <i id="rightButton" class="fas fa-angle-right right-button"></i>
@@ -70,17 +104,17 @@
 
 
                 <!--Selector-->
-                <div style="display: block; margin-bottom: 10px">
+                <div id="selector-box" style="display: block; margin-bottom: 10px">
                     <div class="btn-group btn-group-toggle visual" data-toggle="buttons">
                         <label class="btn btn-secondary active visual">
-                            <input type="radio" name="options" id="chordSelector" autocomplete="off" checked> Circular Graph
+                            <input type="radio" name="options" id="chordSelector" autocomplete="off" checked> Root Wheel
                         </label>
-                        <label class="btn btn-secondary visual">
+                        <label id="mapSelectorButton" class="btn btn-secondary visual">
                             <input type="radio" name="options" id="mapSelector" autocomplete="off"> Map
                         </label>
-                        <label class="btn btn-secondary visual">
-                            <input type="radio" name="options" id="familySelector" autocomplete="off"> Family Trees
-                        </label>
+                        <!--<label class="btn btn-secondary visual">-->
+                            <!--<input type="radio" name="options" id="familySelector" autocomplete="off"> Family Trees-->
+                        <!--</label>-->
                     </div>
                 </div>
 
@@ -136,7 +170,7 @@
                 <!--<input id="buyer" style="flex-grow: 1" type="text" class="form-control typeahead" data-provide="typeahead">-->
                 <!--&lt;!&ndash;<button id="familyButton" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px" type="button" class="btn btn-primary">Filter</button>&ndash;&gt;-->
                 <!--</div>-->
-                <label class="label-header">Buyer:</label>
+                <label class="label-header" data-intro='Hello step two!'>Buyer:</label>
                 <div class="filter-input-container">
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle input-filter" style="width: 230px" type="button" id="dropdownBuyerButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -173,27 +207,29 @@
                 <!--&lt;!&ndash;<button id="familyButton" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px" type="button" class="btn btn-primary">Filter</button>&ndash;&gt;-->
                 <!--</div>-->
                 <!--Checkbox-->
-                <div class="form-check" style="margin-bottom: 5px">
-                    <input type="checkbox" class="form-check-input" id="katharineJacksonCheck">
-                    <label class="form-check-label" id="checkbox3">Enslaved persons on the Katharine Jackson</label>
-                </div>
+                <!--<div class="form-check" style="margin-bottom: 5px">-->
+                    <!--<input type="checkbox" class="form-check-input" id="katharineJacksonCheck">-->
+                    <!--<label class="form-check-label" id="checkbox3">Enslaved persons on the Katharine Jackson</label>-->
+                <!--</div>-->
                 <div class="filter-input-container">
                     <div style="flex-grow: 1"></div>
                     <!--<input id="inputFamily" style="flex-grow: 1" type="text" class="form-control typeahead" data-provide="typeahead">-->
                     <button id="familyButton" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px" type="button" class="btn btn-primary">Filter</button>
                 </div>
-                <label class="label-header larger-header" style="margin-top: 10px">Select Enslaved Person</label>
+                <div id="person-selection-container">
+                    <label class="label-header larger-header" style="margin-top: 10px">Select Enslaved Person</label>
 
-                <!--Enslaved Person-->
-                <label class="label-header">Person:</label>
-                <div class="filter-input-container">
-                    <input id="selectPerson" style="flex-grow: 1" type="text" class="form-control typeahead" data-provide="typeahead">
-                    <button id="selectButton" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px" type="button" class="btn btn-primary">Select</button>
-                </div>
-                <!--Checkbox-->
-                <div class="form-check" style="margin-bottom: 5px">
-                    <input type="checkbox" class="form-check-input" id="searchWithinFilterConditionsCheck">
-                    <label class="form-check-label" id="checkbox2">Search for enslaved persons within filter conditions</label>
+                    <!--Enslaved Person-->
+                    <label class="label-header">Person:</label>
+                    <div class="filter-input-container">
+                        <input id="selectPerson" style="flex-grow: 1" type="text" class="form-control typeahead" data-provide="typeahead">
+                        <button id="selectButton" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px" type="button" class="btn btn-primary">Select</button>
+                    </div>
+                    <!--Checkbox-->
+                    <div class="form-check" style="margin-bottom: 5px">
+                        <input type="checkbox" class="form-check-input" id="searchWithinFilterConditionsCheck">
+                        <label class="form-check-label" id="checkbox2">Search for enslaved persons within filter conditions</label>
+                    </div>
                 </div>
 
 
@@ -201,21 +237,105 @@
                     <label class="label-header larger-header" style="margin-top: 10px">Chord Controls</label>
                     <!--Chord Controls-->
                     <label class="label-header">Size:</label>
-                    <input style="position:relative;top:3px; margin-bottom: 15px; width: 100%" type="range" min="65" max="100" value="85">
+                    <input id="multiplierRange" style="position:relative;top:3px; margin-bottom: 15px; width: 100%" type="range" min="60" max="100" value="85">
 
                     <!--Checkbox-->
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="otherCheckbox">
                         <label class="form-check-label" id="checkbox">Show enslaved people without buyer data</label>
                     </div>
+                    <!--Checkbox-->
+                    <div id="magnifyNamesCheckBoxContainer" class="form-check" style="margin-bottom: 5px; margin-top: 10px">
+                        <input type="checkbox" class="form-check-input" id="magnifyNamesConditionBox">
+                        <label class="form-check-label" id="checkbox4">Magnify names when hovering over them</label>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
+<script src="dependencies/enjoyhint.min.js"></script>
+<script src="dependencies/enjoyhint.js"></script>
 <script type="text/javascript" src="js/map.js"></script>
+<script>
+    var enjoyhint_instance = new EnjoyHint({
+        onEnd: function() {
+            d3.select("#end-modal-screen").classed("hidden-modal", false);
+            d3.select("#full-screen-modal").classed("hidden-modal", false);
+        }
+    });
+    function getCookie(name) {
+        var dc = document.cookie;
+        var prefix = name + "=";
+        var begin = dc.indexOf("; " + prefix);
+        if (begin == -1) {
+            begin = dc.indexOf(prefix);
+            if (begin != 0) return null;
+        }
+        else
+        {
+            begin += 2;
+            var end = document.cookie.indexOf(";", begin);
+            if (end == -1) {
+                end = dc.length;
+            }
+        }
+        // because unescape has been deprecated, replaced with decodeURI
+        //return unescape(dc.substring(begin + prefix.length, end));
+        return decodeURI(dc.substring(begin + prefix.length, end));
+    }
+    $("#finishNextButton").mousedown(function() {
+        d3.select("#end-modal-screen").classed("hidden-modal", true);
+        d3.select("#full-screen-modal").classed("hidden-modal", true);
+    });
+
+    if (!getCookie("pathways_first_login")) {
+        d3.select("#welcome-modal-screen").classed("hidden-modal", false);
+        d3.select("#full-screen-modal").classed("hidden-modal", false);
+    }
+    $("#welcomeNextButton").mousedown(function() {
+//            document.cookie="pathways_first_login=false";
+
+        d3.select("#welcome-modal-screen").classed("hidden-modal", true);
+        d3.select("#full-screen-modal").classed("hidden-modal", true);
+
+        d3.select("#right-container").classed("stage-open", false);
+        var enjoyhint_script_steps = [
+            {
+                selector:"#svgTop",
+                event_type: "custom",
+                description:'<div style="width: 30VW; text-align: left">This is the main visual window which can depict several different types of graphs. ' +
+                'The current graph depicts where the Jesuits sold individual members of the GU272. You can hover over the names to see members who the Jesuits ' +
+                'sold, but for now select an enslaved person, by clicking on the person\'s name, to continue.</div>',
+                sideStatement: ['top', 'right', 'top']
+            },
+            {
+                selector:"#magnifyNamesCheckBoxContainer",
+                event_type: "next",
+                description:'<div style="width: 30VW; text-align: left">Did you experience any lag when hovering over names on the root wheel? Unfortunately, if your browser ' +
+                'is out of date, or if your computer is slow, you may run into some performance issues when magnifying names as you interact with the visualization. ' +
+                'If needed, turn this feature off to improve performance. Click next to continue.</div>',
+                sideStatement: ['bottom', 'left', 'left']
+            },
+            {
+                selector:"#person-selection-container",
+                event_type: "next",
+                description:'<div style="width: 30VW; text-align: left">Now, notice that when you selected a person in the root wheel, the person was also selected here. ' +
+                'You can try searching for a different person in this autocomplete field if you would like, but that is not necessary. Just click next when you are ready to continue.</div>'
+            },
+            {
+                selector:"#mapSelectorButton",
+                event_type: "custom",
+                description: '<div style="width: 30VW; text-align: left">Next, click on the map button to see the path in which the person you selected traveled after the Jesuits sold ' +
+                'the person to either Jesse Batey or Henry Johnson</div>',
+                sideStatement: ['right', 'bottom', 'bottom']
+            }
+        ];
+        enjoyhint_instance.set(enjoyhint_script_steps);
+        enjoyhint_instance.run();
+    });
+
+</script>
 </body>
 </html>
 
