@@ -42,7 +42,7 @@
     <div style="width: 100%; top: 30%; position: relative; text-align: center">
         <label class="welcome-title">Walkthrough Complete</label>
         <div style="width: 70%; margin: auto">
-            <label style="text-align: justify">You have reached the end of the feature walkthrough for the Pathways data visualization. From here you are free to explore the GU272 data.</label>
+            <label style="text-align: justify">You have reached the end of the feature walkthrough for the Pathways data visualization. From here, you are free to explore the GU272 data and test the other features not shown in this walkthrough.</label>
         </div>
         <div style="width: 100%; text-align: center; margin-top: 20px">
             <div class="enjoyhint_next_btn" style="display: inline-block; position: static; content: 'Finish'" id="finishNextButton">
@@ -247,7 +247,7 @@
                     <!--Checkbox-->
                     <div id="magnifyNamesCheckBoxContainer" class="form-check" style="margin-bottom: 5px; margin-top: 10px">
                         <input type="checkbox" class="form-check-input" id="magnifyNamesConditionBox">
-                        <label class="form-check-label" id="checkbox4">Magnify names when hovering over them</label>
+                        <label class="form-check-label" id="checkbox4">Magnify names when hovering over them (turn off to improve performance)</label>
                     </div>
                 </div>
             </div>
@@ -310,9 +310,9 @@
             {
                 selector:"#svgTop",
                 event_type: "custom",
-                description:'<div style="width: 30VW; text-align: left">This is the main visual window which can depict several different types of graphs. ' +
-                'The current graph depicts where the Jesuits sold individual members of the GU272. You can hover over the names to see members who the Jesuits ' +
-                'sold, but for now select an enslaved person, by clicking on the person\'s name, to continue.</div>',
+                description:'<div style="width: 30VW; text-align: left">This is the main visual window which can depict two different types of graphs. ' +
+                'The current graph, called the root wheel, depicts where the Jesuits sold individual members of the GU272. You can hover over the names to see members who the Jesuits ' +
+                'sold, but for now, select an enslaved person by clicking on the person\'s name to continue.</div>',
                 sideStatement: ['top', 'right', 'top']
             },
             {
@@ -335,6 +335,13 @@
                 description: '<div style="width: 30VW; text-align: left">Next, click on the map button to see the path in which the person you selected traveled after the Jesuits sold ' +
                 'the person to either Jesse Batey or Henry Johnson</div>',
                 sideStatement: ['right', 'bottom', 'bottom']
+            },
+            {
+                selector:"#mapBox",
+                event_type: "next",
+                description: '<div style="width: 30VW; text-align: left">As you can see, the map shows the path in which the Jesuits sent the person you selected after the Jesuits sold him ' +
+                'or her to either Batey or Johnson.</div>',
+                sideStatement: ['bottom', 'right', 'bottom']
             }
         ];
         enjoyhint_instance.set(enjoyhint_script_steps);
