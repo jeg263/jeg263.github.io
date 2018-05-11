@@ -6,7 +6,6 @@
     <link href="https://fonts.googleapis.com/css?family=IM+Fell+Double+Pica|IM+Fell+English+SC" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link href="./css/enjoyhint.css" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="./dependencies/jquery.fullpage.css">
 </head>
 <body>
@@ -24,43 +23,116 @@
 <script type="text/javascript" src="./js/familyData.js"></script>
 <script type="text/javascript" src="./js/chordDiagram.js"></script>
 <script type="text/javascript" src="./js/visualizationControls.js"></script>
+<!--<script type="text/javascript" src="./dependencies/scrolloverflow.min.js"></script>-->
+<script type="text/javascript" src="./dependencies/jquery.fullpage.js"></script>
 <script type="text/javascript">
-
+    $(document).ready(function() {
+        $('#fullpage').fullpage({
+            sectionsColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
+            anchors: ['home', 'timelinePage', 'dataExplorer', 'newPage', 'lastPage'],
+            menu: '#menu',
+            scrollOverflow: true,
+            autoScrolling: false,
+        });
+    });
+    $(document).scroll(function() {
+        var y = $(this).scrollTop();
+        if (y >= $('#titlePage').height()) {
+            $('#header').show();
+        } else {
+            $('#header').hide();
+        }
+    });
+    //    fitToSection: false,
+    //    scrollingSpeed: 1000,
 </script>
-<!--<div id="welcome-modal-screen" class="welcome-modal-screen hidden-modal" style="overflow: scroll">-->
-    <!--<div style="width: 100%; top: 20%; position: relative; text-align: center">-->
-        <!--<label class="welcome-title">Welcome to Pathways</label>-->
-        <!--<div style="width: 70%; margin: auto">-->
-            <!--<label style="text-align: justify">This appears to be your first time using the Pathways data visualization. Pathways is a data visualization tool that allows users to explore where the Jesuits sold each member of the GU272, what families they split apart, the number of children sold, and the gender breakdown of the GU272.  Before getting started however, follow this brief walkthrough to discover the functionality within it.</label>-->
-        <!--</div>-->
-        <!--<div style="width: 100%; text-align: center; margin-top: 20px"><div class="enjoyhint_next_btn" style="display: inline-block; position: static;" id="welcomeNextButton">-->
-            <!--Continue-->
-        <!--</div></div>-->
-    <!--</div>-->
-<!--</div>-->
-<!--<div id="end-modal-screen" class="welcome-modal-screen hidden-modal" style="overflow: scroll">-->
-    <!--<div style="width: 100%; top: 30%; position: relative; text-align: center">-->
-        <!--<label class="welcome-title">Walkthrough Complete</label>-->
-        <!--<div style="width: 70%; margin: auto">-->
-            <!--<label style="text-align: justify">You have reached the end of the feature walkthrough for the Pathways data visualization. From here, you are free to explore the GU272 data and test the other features not shown in this walkthrough.</label>-->
-        <!--</div>-->
-        <!--<div style="width: 100%; text-align: center; margin-top: 20px">-->
-            <!--<div class="enjoyhint_next_btn" style="display: inline-block; position: static; content: 'Finish'" id="finishNextButton">-->
-                <!--Finish-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->
-<div id="full-screen-modal" class="full-screen-modal hidden-modal"></div>
 <div id="fullpage">
-    <div id="header" class="header-bar" style="display: block">
+    <div id="header" class="header-bar">
         <a href="#home" style="color: white; display: inline-block; float: left; margin-top: 3px; margin-left: 20px">
-            <div class="header-bar-title" style="display: inline-block; float: left; margin-left: 7px; margin-top: 9px; font-size: 22px;">Pathways: GU272 Data Explorer</div>
+            <div class="header-bar-title" style="display: inline-block; float: left; margin-left: 7px; margin-top: 9px; font-size: 22px;">Title</div>
             <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-top: 3px;">GU</div>-->
             <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-top: -3px;">272</div>-->
             <!--&lt;!&ndash;<div class="header-bar-title" style="display: inline-block; float: left; margin-top: 9px; margin-left: 5px; font-size: 18px;">DIGITAL EXPLORER</div>&ndash;&gt;-->
-            <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-left: 7px; margin-top: 9px; font-size: 22px;">PATHWAYS</div>-->
+            <!--<div class="header-bar-title" style="display: inline-block; float: left; margin-left: 7px; margin-top: 9px; font-size: 22px;">DIGITAL EXPLORER</div>-->
         </a>
+        <div class="nav-bar-links-container">
+            <div class="link-item">
+                <a href="#timelinePage">Timeline</a>
+            </div>
+            <div class="link-item">
+                <a href="#dataExplorer">Data Explorer</a>
+            </div>
+        </div>
+    </div>
+    <div id="titlePage" class="section">
+        <div id="cover" class="page" style="background: black">
+            <div class="nav-bar">
+                <div class="nav-bar-links-container">
+                    <div class="link-item">
+                        <a href="#timelinePage">Timeline</a>
+                    </div>
+                    <div class="link-item">
+                        <a href="#dataExplorer">Data Explorer</a>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="content">
+                            <h2 class="top title-label">meet the</h2>
+                            <div style="display: inline-block">
+                                <h1 class="title-header-label" style="display: inline-block; float: left">GU</h1><h1 class="title-header-label" style="display: inline-block; float: left; margin-top: -17px;">272</h1>
+                            </div>
+                            <h2 class="top title-label">a digital exploration of</h2>
+                            <h2 class="title-label"> georgetown's history of slavery</h2>
+                            <!-- <h2> a digital exploration of georgetown's slavery history </h2> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section section2">
+        <!--<div style="width: 100%; height: 1400px"></div>-->
+        <div class="page" style="height: 350VH !important; display: inline-block">
+            <div id="timeline" class="fixed">
+                <ul class="timeline-dates">
+                    <li class="line long-line"></li>
+                    <li class="year">1838</li>
+                    <li class="line short-line"></li>
+                    <li>
+                        <a href="#june1838" id="date-1" class="date" title="Scroll to January 1838"><span class="date-dot-label">June</span></a>
+                    </li>
+                    <li class="line short-line"></li>
+                    <li>
+                        <a href="#dec1838" id="date-2" class="date" title="Scroll to December 1838"><span class="date-dot-label">December</span></a>
+                    </li>
+                    <li class="line long-line"></li>
+                    <li class="year">1848</li>
+                    <li class="line short-line"></li>
+                    <li>
+                        <a href="#mar1848" id="date-3" class="date" title="Scroll to April 1863"><span class="date-dot-label">March</span></a>
+                    </li>
+                    <li class="line long-line"></li>
+                </ul>
+            </div>
+            <div class="date-container">
+                <p id= "blank-1" class="blank"></p>
+                <div id="date-info-1" class="date-info" >
+                    In June 1838, Georgetown president and Jesuit priest Fr. Thomas Mulledy agreed to sell 272 men, women, and children. They were sold to Henry Johnson, a member of the House of Representatives, and Jesse Beatty, a landowner in Louisiana. The sale was worth about $3.3 million in today's dollars.
+                </div>
+                <p id="blank-2" class="blank"></p>
+                <div id="date-info-2" class="date-info">In Dec. 1838, a group of the slaves were transported from Alexandria to New Orleans on the ship manifest of the Katharine Jackson. The cargo included dozens of children, among them infants as young as 2 months old. They were shipped by Robert A. Windsor of Alexandria and consigned to Lambeth and Thompson of New Orleans.</div>
+                <p id="blank-3"class="blank"></p>
+                <div id="date-info-3" class="date-info">
+                    In March 1848, Reverend James Van de Velde lamented that the religious instruction of the slaves sold to Henry Johnson has been neglected. He urges Jesuit leaders to send money for the construction of a church that would "provide for the salvation of those poor people, who are now utterly neglected."
+                </div>
+                <p id="blank-4"class="blank"></p>
+                <div id="date-info-4" class="date-info">In 2018, ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+            </div>
+        </div>
+
     </div>
     <div class="section">
         <!--<div style="width: 100%; height: 47px; background: #393a3d;">-->
@@ -113,7 +185,7 @@
                             <input type="radio" name="options" id="mapSelector" autocomplete="off"> Map
                         </label>
                         <!--<label class="btn btn-secondary visual">-->
-                            <!--<input type="radio" name="options" id="familySelector" autocomplete="off"> Family Trees-->
+                        <!--<input type="radio" name="options" id="familySelector" autocomplete="off"> Family Trees-->
                         <!--</label>-->
                     </div>
                 </div>
@@ -208,8 +280,8 @@
                 <!--</div>-->
                 <!--Checkbox-->
                 <!--<div class="form-check" style="margin-bottom: 5px">-->
-                    <!--<input type="checkbox" class="form-check-input" id="katharineJacksonCheck">-->
-                    <!--<label class="form-check-label" id="checkbox3">Enslaved persons on the Katharine Jackson</label>-->
+                <!--<input type="checkbox" class="form-check-input" id="katharineJacksonCheck">-->
+                <!--<label class="form-check-label" id="checkbox3">Enslaved persons on the Katharine Jackson</label>-->
                 <!--</div>-->
                 <div class="filter-input-container">
                     <div style="flex-grow: 1"></div>
@@ -254,102 +326,13 @@
             </div>
         </div>
     </div>
+    <div class="section">Some section 3</div>
+    <div class="section">Some section 3</div>
+    <div class="section">Some section 4</div>
 </div>
-<script src="dependencies/enjoyhint.min.js"></script>
-<script src="dependencies/enjoyhint.js"></script>
+
+
 <script type="text/javascript" src="js/map.js"></script>
-<!--<script>-->
-    <!--var enjoyhint_instance;-->
-    <!--function getCookie(name) {-->
-        <!--var dc = document.cookie;-->
-        <!--var prefix = name + "=";-->
-        <!--var begin = dc.indexOf("; " + prefix);-->
-        <!--if (begin == -1) {-->
-            <!--begin = dc.indexOf(prefix);-->
-            <!--if (begin != 0) return null;-->
-        <!--}-->
-        <!--else-->
-        <!--{-->
-            <!--begin += 2;-->
-            <!--var end = document.cookie.indexOf(";", begin);-->
-            <!--if (end == -1) {-->
-                <!--end = dc.length;-->
-            <!--}-->
-        <!--}-->
-        <!--// because unescape has been deprecated, replaced with decodeURI-->
-        <!--//return unescape(dc.substring(begin + prefix.length, end));-->
-        <!--return decodeURI(dc.substring(begin + prefix.length, end));-->
-    <!--}-->
-    <!--$("#finishNextButton").mousedown(function() {-->
-        <!--d3.select("#end-modal-screen").classed("hidden-modal", true);-->
-        <!--d3.select("#full-screen-modal").classed("hidden-modal", true);-->
-        <!--enjoyhint_instance = null;-->
-    <!--});-->
-
-    <!--if (!getCookie("pathways_first_login")) {-->
-        <!--enjoyhint_instance = new EnjoyHint({-->
-            <!--onEnd: function() {-->
-                <!--enjoyhint_instance = null;-->
-                <!--d3.select("#end-modal-screen").classed("hidden-modal", false);-->
-                <!--d3.select("#full-screen-modal").classed("hidden-modal", false);-->
-            <!--},-->
-            <!--onSkip: function () {-->
-                <!--enjoyhint_instance = null;-->
-            <!--}-->
-        <!--});-->
-        <!--d3.select("#welcome-modal-screen").classed("hidden-modal", false);-->
-        <!--d3.select("#full-screen-modal").classed("hidden-modal", false);-->
-    <!--}-->
-    <!--$("#welcomeNextButton").mousedown(function() {-->
-            <!--document.cookie="pathways_first_login=false";-->
-
-        <!--d3.select("#welcome-modal-screen").classed("hidden-modal", true);-->
-        <!--d3.select("#full-screen-modal").classed("hidden-modal", true);-->
-
-        <!--d3.select("#right-container").classed("stage-open", false);-->
-        <!--var enjoyhint_script_steps = [-->
-            <!--{-->
-                <!--selector:"#svgTop",-->
-                <!--event_type: "custom",-->
-                <!--description:'<div style="width: 30VW; text-align: left">This is the main visual window which can depict two different types of graphs. ' +-->
-                <!--'The current graph, called the Roots Wheel, depicts where the Jesuits sold individual members of the GU272. You can hover over the names to see who the Jesuits sold where, ' +-->
-                <!--'but for now, select an enslaved person by clicking on the person\'s name to continue.</div>',-->
-                <!--sideStatement: ['top', 'right', 'top']-->
-            <!--},-->
-            <!--{-->
-                <!--selector:"#magnifyNamesCheckBoxContainer",-->
-                <!--event_type: "next",-->
-                <!--description:'<div style="width: 30VW; text-align: left">Did you experience any lag when hovering over names on the Roots Wheel? Unfortunately, if your browser ' +-->
-                <!--'is out of date, or if your computer is slow, you may run into some performance issues when magnifying names as you interact with the visualization. ' +-->
-                <!--'If needed, turn this feature off to improve performance. Click next to continue.</div>',-->
-                <!--sideStatement: ['bottom', 'left', 'left']-->
-            <!--},-->
-            <!--{-->
-                <!--selector:"#person-selection-container",-->
-                <!--event_type: "next",-->
-                <!--description:'<div style="width: 30VW; text-align: left">Now, notice that when you selected a person in the Root Wheel, the person was also selected here. ' +-->
-                <!--'You can try searching for a different person in this autocomplete field if you would like, but that is not necessary. Just click next when you are ready to continue.</div>'-->
-            <!--},-->
-            <!--{-->
-                <!--selector:"#mapSelectorButton",-->
-                <!--event_type: "custom",-->
-                <!--description: '<div style="width: 30VW; text-align: left">Next, click on the map button to see the path in which the person you selected traveled after the Jesuits sold ' +-->
-                <!--'the person to either Jesse Batey or Henry Johnson</div>',-->
-                <!--sideStatement: ['right', 'bottom', 'bottom']-->
-            <!--},-->
-            <!--{-->
-                <!--selector:"#mapBox",-->
-                <!--event_type: "next",-->
-                <!--description: '<div style="width: 30VW; text-align: left">As you can see, the map shows the path in which the Jesuits sent the person you selected after they sold him ' +-->
-                <!--'or her.</div>',-->
-                <!--sideStatement: ['bottom', 'right', 'bottom']-->
-            <!--}-->
-        <!--];-->
-        <!--enjoyhint_instance.set(enjoyhint_script_steps);-->
-        <!--enjoyhint_instance.run();-->
-    <!--});-->
-
-<!--</script>-->
 </body>
 </html>
 

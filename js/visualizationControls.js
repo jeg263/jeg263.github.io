@@ -82,8 +82,8 @@ function controllerMain() {
             showHidePanels();
         });
         $("#mapSelector").change(function(result){
-            if (enjoyhint_instance)
-                enjoyhint_instance.trigger('next');
+            // if (enjoyhint_instance)
+            //     enjoyhint_instance.trigger('next');
             showChord = false;
             showMap = true;
             showHidePanels();
@@ -355,8 +355,8 @@ function controllerMain() {
         setFilterControlVariables();
     };
     controller.selectEnslavedPerson = function(personData) {
-        if (enjoyhint_instance)
-            enjoyhint_instance.trigger('next');
+        // if (enjoyhint_instance)
+        //     enjoyhint_instance.trigger('next');
         var name = personData.full_name.substr(personData.full_name.indexOf(" ") + 1);
         selectPersonSearchTerm = name;
         $("#selectPerson").val(name);

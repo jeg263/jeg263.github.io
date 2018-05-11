@@ -40,8 +40,21 @@ function chordDiagramMain() {
 
     //launch visualization
     $(document).ready(function() {
-        var radius = ($("#left-container").width()) / 1.88;
-        chord.multiplier = (2 * radius) / wReal;
+        var xRadius = ($("#left-container").width()) / 1.88;
+        var yRadius = ($("#left-container").height()) / 1.88;
+        var xMultiplier = (2 * xRadius) / wReal;
+        var yMultiplier = (2 * yRadius) / hReal;
+
+        if (xMultiplier < yMultiplier) {
+            chord.multiplier = xMultiplier;
+        }
+        else {
+            chord.multiplier = yMultiplier;
+        }
+        if (chord.multiplier < 0.6) {
+            chord.multiplier = 0.6;
+        }
+
         updateVariables();
 
         //create fisheye distortion variables

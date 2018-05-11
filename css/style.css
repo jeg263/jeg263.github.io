@@ -502,19 +502,19 @@ path.arc {
     height: 100%;
     width: 100%;
 }
-#cover {
-    background: black;
-    /*background: url(../images/bacg);*/
-    /*background: url(../images/00georgetown9-superJumbo.jpg);*/
-    /*background: url(../images/archivalimage.png);*/
-    /*opacity: 0.60;*/
-    /*z-score: 99;*/
-    /*filter: alpha(opacity=90); /* For IE8 and earlier */
-background-size: cover;				/* Adjust size */
-    background-position: center;	/* Adjust position */
-    /*font-family: "Lato" !important;*/
-    color: black;
-}
+/*#cover {*/
+    /*background: black;*/
+    /*!*background: url(../images/bacg);*!*/
+    /*!*background: url(../images/00georgetown9-superJumbo.jpg);*!*/
+    /*!*background: url(../images/archivalimage.png);*!*/
+    /*!*opacity: 0.60;*!*/
+    /*!*z-score: 99;*!*/
+    /*!*filter: alpha(opacity=90); !* For IE8 and earlier *!*/
+/*background-size: cover;				!* Adjust size *!*/
+    /*background-position: center;	!* Adjust position *!*/
+    /*!*font-family: "Lato" !important;*!*/
+    /*color: black;*/
+/*}*/
 
 
 h1 {
@@ -651,6 +651,7 @@ p.blank {
     width: 100%;
     /*height: 47px;*/
     height: 54px;
+    /*height: 3.35rem;*/
     top: 0;
     z-index: 5;
     /*background: white;*/
