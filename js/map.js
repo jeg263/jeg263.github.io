@@ -268,12 +268,14 @@ function mapMain() {
 
             var path = mapSVG.select("#migrationPath").remove();
 
-            mapSVG.selectAll("#migrationPathPortions").data(quads(samples(path.node(), 8)))
+            if (path && path.node()) {
+                mapSVG.selectAll("#migrationPathPortions").data(quads(samples(path.node(), 8)))
 
-                .enter().append("svg:path").attr("id", "migrationPathPortions")
-                .style("fill", function(d) { return gradientColor(d.t, colors[sourceIndex % colors.length], colors[destinationIndex % colors.length]); })
-                .style("stroke", function(d) { return gradientColor(d.t, colors[sourceIndex % colors.length], colors[destinationIndex % colors.length]); })
-                .attr("d", function(d) { return lineJoin(d[0], d[1], d[2], d[3], 2); });
+                    .enter().append("svg:path").attr("id", "migrationPathPortions")
+                    .style("fill", function(d) { return gradientColor(d.t, colors[sourceIndex % colors.length], colors[destinationIndex % colors.length]); })
+                    .style("stroke", function(d) { return gradientColor(d.t, colors[sourceIndex % colors.length], colors[destinationIndex % colors.length]); })
+                    .attr("d", function(d) { return lineJoin(d[0], d[1], d[2], d[3], 2); });
+            }
 
 
         // .style("stroke",colors[destinationIndex % colors.length])
