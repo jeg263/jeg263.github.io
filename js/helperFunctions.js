@@ -1,19 +1,18 @@
 //Helper functions
-String.prototype.replaceAll = function(search, replacement) {
+String.prototype.replaceAll = function(search, replacement) { //replace all of one character with another in a string
     var target = this;
     return target.split(search).join(replacement);
 };
-function cleanName(name) {
+function cleanName(name) { //Clean name for data visualization so that it makes for a good id
     return name.replaceAll(".", "").replaceAll(" ", "").replaceAll("\'", "").replaceAll("?", "").replaceAll("[", "").replaceAll("]", "");
 }
-function cleanDataLine(obj) {
+function cleanDataLine(obj) { //sets origin and destination with cleaned data
     obj.origin = cleanName(obj.farm_name);
-    // obj.id = cleanName(obj.full_name) + obj.id;
     obj.destination = cleanName(obj.buyer_name);
     return obj;
 }
-function csvJSON(csv){
-    var lines = csv.split("\n")
+function csvJSON(csv){ //Convert CSV to JSON
+    var lines = csv.split("\n");
     var result = [];
     var headers = lines[0].split(",");
 
@@ -34,7 +33,7 @@ function csvJSON(csv){
 
     return result // JavaScript object
 }
-function containsObject(obj, list) {
+function containsObject(obj, list) { //Check if an array contains an object
     var i;
     for (i = 0; i < list.length; i++) {
         if (list[i] === obj) {

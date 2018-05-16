@@ -73,22 +73,17 @@ function chordDiagramMain() {
             url: "./data/data.csv",
             dataType: "text",
             success: function(data) {
-                //load family data
                 //Set original data
                 originalData = data;
                 chord.originalData = data;
-                // setFilterControlVariables();
-                // familyData = family.processFamilyData(json);
                 resetCSVData();
                 refreshVisualization(null, true);
                 controller.onDataLoad();
-                controller.didUpdateMultiplier();
-                // d3v2.select("#mapContainer").classed("hidden", true);
-                // d3v2.select("#mapContainer").classed("opacity0", true);
+                controller.didUpdateMultiplier(); //multiplier was updated above
             }
         });
     });
-    chord.refreshVisualization = function(filter, resetData) { refreshVisualization(filter, resetData); }
+    chord.refreshVisualization = function(filter, resetData) { refreshVisualization(filter, resetData); };
     function refreshVisualization(filter, resetData) {
         resetData = (typeof resetData !== 'undefined') ?  resetData : false;
 
@@ -99,55 +94,22 @@ function chordDiagramMain() {
         if (!chord.showOtherData)
             csvData = csvData.filter(function (p) { return p.buyer_name !== "" });
 
-        if (filter) {
+        if (filter) { //run filter
             var rawData = csvData.filter(filter);
             var filterData = processData(rawData);
             dataForVisualization = runFilter(allData, filterData);
         }
-        else if (resetData) {
+        else if (resetData) { //re-set data to fresh copy
             dataForVisualization = getAllDataCopy();
         }
         else { dataForVisualization = allData }
         updateVariables();
         allData = dataForVisualization;
         constructVisualization(allData);
-
-        // if (chord.showOtherData) {
-        //     if (chord.multiplier < 0.6) {
-        //         div.select("#svgTop").classed("very-small", false).classed("super-small", false).classed("super-super-small", true).classed("super-super-tiny-small", false).classed("could-not-be-smaller", true);
-        //     }
-        //     if (chord.multiplier < 0.7) {
-        //         div.select("#svgTop").classed("very-small", false).classed("super-small", false).classed("super-super-small", true).classed("super-super-tiny-small", true).classed("could-not-be-smaller", false);
-        //     }
-        //     if (chord.multiplier < 0.8) {
-        //         div.select("#svgTop").classed("very-small", false).classed("super-small", false).classed("super-super-small", true).classed("super-super-tiny-small", false).classed("could-not-be-smaller", false);
-        //     }
-        //     else if (chord.multiplier < 0.9) {
-        //         div.select("#svgTop").classed("very-small", false).classed("super-small", true).classed("super-super-small", false).classed("super-super-tiny-small", false).classed("could-not-be-smaller", false);
-        //     }
-        //     else {
-        //         div.select("#svgTop").classed("very-small", true).classed("super-small", false).classed("super-super-small", false).classed("super-super-tiny-small", false).classed("could-not-be-smaller", false);
-        //     }
-        // }
-        // else {
-        //     if (chord.multiplier < 0.6) {
-        //         div.select("#svgTop").classed("small", false).classed("very-small", false).classed("super-super-small", false).classed("super-super-tiny-small", true);
-        //     }
-        //     if (chord.multiplier < 0.7) {
-        //         div.select("#svgTop").classed("small", false).classed("very-small", false).classed("super-super-small", true).classed("super-super-tiny-small", false);
-        //     }
-        //     if (chord.multiplier < 0.8) {
-        //         div.select("#svgTop").classed("small", false).classed("very-small", true).classed("super-super-small", false).classed("super-super-tiny-small", false);
-        //     }
-        //     else if (chord.multiplier < 0.9) {
-        //         div.select("#svgTop").classed("small", true).classed("very-small", false).classed("super-super-small", false).classed("super-super-tiny-small", false);
-        //     }
-        //     else {
-        //         div.select("#svgTop").classed("small", false).classed("very-small", false).classed("super-super-small", false).classed("super-super-tiny-small", false);
-        //     }
-        // }
     }
-    function processData(rawData) {
+    function processData(rawData) { //process data for viz format
+
+        //For every person sold from a to b - add a line in json with name root.a.PERSON_ID - points to b
         var json = rawData.map(function (obj) {
             obj = cleanDataLine(obj);
             obj.id = cleanName(obj.full_name) + obj.id;
@@ -161,6 +123,7 @@ function chordDiagramMain() {
 
         json = json.filter(function (obj) { return obj !== null });
 
+        //For every person sold from a to b - add a line in json with name root.b.PERSON_ID - points to a
         for (var i in rawData) {
             var obj = cleanDataLine(rawData[i]);
 
@@ -169,6 +132,7 @@ function chordDiagramMain() {
             else if (obj.origin && obj.id)
                 json.push({"name": "root.KOther." + obj.id, "visible": true, "imports": [], "data": obj});
         }
+        //Reset CSV data so next time it is used it is not modified by the above code
         resetCSVData();
 
         return json;
@@ -210,11 +174,12 @@ function chordDiagramMain() {
         createPathLinks();
         groupByPlantation();
         createTextNodes();
-        div.on("mousemove", function() {
+        div.on("mousemove", function() { //animate on mousemove over the visualization
             animateWith(this)
         });
 
         function createPathLinks() {
+            //Create path links that connect a person on a plantation to the same person with a buyer
             path = svg.selectAll("path.link")
                 .data(links)
                 .enter().append("svg:path")
@@ -240,6 +205,7 @@ function chordDiagramMain() {
                 });
         }
         function groupByPlantation() {
+            //Calculate arc for group headers that go arround the visualization
             var groupArc = d3v2.svg.arc()
                 .innerRadius(ry - 177)
                 .outerRadius(ry - 157)
@@ -249,6 +215,7 @@ function chordDiagramMain() {
             var counter = 0;
             var counterTwo = 0;
 
+            //Create arc bars
             svg.selectAll("g.arc")
                 .data(groupData[0])
                 .enter().append("svg:path")
@@ -270,7 +237,7 @@ function chordDiagramMain() {
                 .append("svg:text").text(function(d) {
                 return d.className.baseVal; });
 
-            //Add group titles
+            //Add arc/group titles for plantations and buyers
             counter = 0;
             svg.selectAll('g.arc').data(groupData[0]).enter().append("text")
                 .attr("class", function () {
@@ -305,36 +272,37 @@ function chordDiagramMain() {
                     return title});
         }
         function createTextNodes() {
+            //Add names of enslaved persons
             textNodes = svg.selectAll("g.node")
                 .data(nodes.filter(function(n) { return !n.children; }))
                 .enter().append("svg:text")
                 .attr("class", "node")
-                .classed("hidden-node", function (d) {
+                .classed("hidden-node", function (d) { //only show if person should be visible
                     if (d.visible)
                         return false;
                     else
                         return true;
                 })
-                .attr("id", function(d) {
+                .attr("id", function(d) { //set id
                     var finalWord = "source";
                     if (d.imports.length > 0)
                         finalWord = "target";
                     return "node-" + d.key + "-" + finalWord; })
-                .attr("transform", function(d) {
+                .attr("transform", function(d) { //calculate position
                     if ((d.x - 90) > 89) {
                         return "rotate(" + ((d.x - 90) - 180) + ")translate(" + -1 * (d.y + 25) + ", 2)";
                     }
                     else
                         return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 25) + ")";
                 })
-                .classed("right-half", function(d) { return (d.x - 90) > 89})
+                .classed("right-half", function(d) { return (d.x - 90) > 89}) //this class is for if the name is on the right half of the wheel - changes how it is displayed
                 .text(function(d) {
-                    if (d.data !== null) {
+                    if (d.data !== null) { //set text to not include the random a characters
                         return d.data.full_name.substr(d.data.full_name.indexOf(" ") + 1); }
                     else
                         return d.key.replace(/_/g, ' ')
                 })
-                .attr("font-size", function (d) {
+                .attr("font-size", function (d) { //calculate font size based on multiplier and if other data is shown
                     return getFontSizeForTextWith(d);
                 })
                 .on("click", click)
@@ -343,8 +311,8 @@ function chordDiagramMain() {
         }
         var isFocusedAtCenter = false;
         function animateWith(obj) {
-            if (chord.magnifyNamesConditionBox || !isFocusedAtCenter) {
-                var angleDeg;
+            if (chord.magnifyNamesConditionBox || !isFocusedAtCenter) { //if magnification is on
+                var angleDeg; //animate
                 focusFishEyes();
                 animateGroupHeaders();
                 animateLinkLines();
@@ -353,7 +321,7 @@ function chordDiagramMain() {
             else {
                 textNodes.each(function () {
                     
-                }).classed("target", function (d) {
+                }).classed("target", function (d) { //still check for hovering over names
                     return d.data.id === hoveredKey
                 });
             }
@@ -361,6 +329,7 @@ function chordDiagramMain() {
             function focusFishEyes() {
                 if (chord.magnifyNamesConditionBox) {
                     isFocusedAtCenter = false;
+
                     //mouse position
                     var mouseX = d3v2.mouse(obj)[0];
                     var mouseY = d3v2.mouse(obj)[1];
@@ -425,6 +394,7 @@ function chordDiagramMain() {
                     fisheye.focus([angleDeg, fisheyeY]);
                 }
                 else {
+                    //make sure to unfocus the fisheye effect
                     isFocusedAtCenter = true;
                     fisheyeNegative.focus([0, 0]);
                     fisheye.focus([0, 0]);
@@ -433,6 +403,7 @@ function chordDiagramMain() {
             function animateGroupHeaders() {
                 function findFisheyeStartAngle(children) {
                     children.forEach(function (d) {
+                        //since positioning is in degrees fisheye doesn't know that 0 is next to 360 - use this fisheye negative to apply fisheye to both sides
                         if (d.x < 90 && angleDeg > 270)
                             d.fisheye = fisheyeNegative(d);
                         else if (d.x > 270 && angleDeg < 90)
@@ -440,7 +411,7 @@ function chordDiagramMain() {
                         else
                             d.fisheye = fisheye(d)
                     });
-
+                    //start angle of fisheye should be the minimum point - this is used to get new group header locations
                     var min = children[0].fisheye.x;
                     children.forEach(function(d) {
                         if (d.fisheye.x < min)
@@ -449,6 +420,7 @@ function chordDiagramMain() {
                     return min;
                 }
                 function findFisheyeEndAngle(children) {
+                    //find the max angle for grup headers
                     var max = children[0].fisheye.x;
                     children.forEach(function(d) {
                         if (d.fisheye.x > max)
@@ -456,7 +428,7 @@ function chordDiagramMain() {
                     });
                     return max;
                 }
-
+                //Calculate new group header arc based on fisheye distortion
                 var newGroupArc = d3v2.svg.arc()
                     .innerRadius(ry - 177)
                     .outerRadius(ry - 157)
@@ -466,6 +438,7 @@ function chordDiagramMain() {
                 svg.selectAll("path.arcs").each(function (d) {}).attr("d", newGroupArc);
             }
             function animateLinkLines() {
+                //apply fisheye to lines between persons, also apply it to both sides using negative fisheye
                 var newLine = d3v2.svg.line.radial()
                     .interpolate("bundle")
                     .tension(.85)
@@ -493,6 +466,7 @@ function chordDiagramMain() {
                     });
             }
             function animateTextNodes() {
+                //apply distortion to names - use negative fisheye to effect both sides
                 textNodes.each(function (d) {
                     if (d.x < 90 && angleDeg > 270)
                         d.fisheye = fisheyeNegative(d);
@@ -500,29 +474,36 @@ function chordDiagramMain() {
                         d.fisheye = fisheyeNegative(d);
                     else
                         d.fisheye = fisheye(d)
-                }).attr("transform", function(d) {
+                }).attr("transform", function(d) { //transform based on fisheye
                     if ((d.fisheye.x - 90) > 89) {
                         return "rotate(" + ((d.fisheye.x - 90) - 180) + ")translate(" + -1 * (d.y + 25) + ", 2)";
                     }
                     else
                         return "rotate(" + (d.fisheye.x - 90) + ")translate(" + (d.y + 25) + ")";
-                }).classed("target", function (d) {
+                }).classed("target", function (d) { //if hovering over - make target
                     return d.data.id === hoveredKey
-                }).classed("right-half", function(d) { return (d.fisheye.x - 90) > 89})
+                }).classed("right-half", function(d) { return (d.fisheye.x - 90) > 89}) //check if new to right half
                     .attr("font-size", function (d) {
-                        return getFontSizeForTextWith(d)
+                        return getFontSizeForTextWith(d) //calculate new font size based on distortion
                     });
             }
         }
-        function getFontSizeForTextWith(d) {
-            var initialFontSize = 5;
+        function getFontSizeForTextWith(d) { //get font size based on multiplier, distortion, and if other data is shown
+            var addingValueLarge = 5; //value to add if intense distortion
+            var addingValueSmall = 3; //value to add if moderate distortion
+            var initialFontSize = 5; //font size for given multiplier and other data
 
+            //Determine values for above variables based on multiplier and other data
             if (chord.showOtherData) {
                 if (chord.multiplier < 0.6) {
-                    initialFontSize = 1
+                    initialFontSize = 1;
+                    addingValueLarge = 3; //add less in distortion for smaller visualizations
+                    addingValueSmall = 1;
                 }
                 if (chord.multiplier < 0.7) {
-                    initialFontSize = 2
+                    initialFontSize = 2;
+                    addingValueLarge = 3;
+                    addingValueSmall = 1;
                 }
                 if (chord.multiplier < 0.8) {
                     initialFontSize = 3;
@@ -536,7 +517,9 @@ function chordDiagramMain() {
             }
             else {
                 if (chord.multiplier < 0.6) {
-                    initialFontSize = 2
+                    initialFontSize = 2;
+                    addingValueLarge = 3;
+                    addingValueSmall = 1;
                 }
                 if (chord.multiplier < 0.7) {
                     initialFontSize = 3
@@ -552,14 +535,14 @@ function chordDiagramMain() {
                 }
             }
 
-
+            //apply fisheye distortion
             if (!d.fisheye)
                 return initialFontSize;
             else {
                 if (d.fisheye.z - 1 > 0.8)
-                    return initialFontSize + 5;
+                    return initialFontSize + addingValueLarge;
                 else if (d.fisheye.z - 1 > 0.6)
-                    return initialFontSize + 2;
+                    return initialFontSize + addingValueSmall;
                 else if (d.fisheye.z - 1 > 0.3)
                     return initialFontSize;
                 else if (d.fisheye.z - 1 > 0) {
@@ -571,23 +554,8 @@ function chordDiagramMain() {
                 else
                     return initialFontSize;
             }
-
-            // if (!d.fisheye)
-            //     return 5;
-            // else {
-            //     if (d.fisheye.z - 1 > 0.8)
-            //         return 10;
-            //     else if (d.fisheye.z - 1 > 0.6)
-            //         return 7;
-            //     else if (d.fisheye.z - 1 > 0.3)
-            //         return 5;
-            //     else if (d.fisheye.z - 1 > 0)
-            //         return 3;
-            //     else
-            //         return 5
-            // }
         }
-        function toDegrees (angle) {
+        function toDegrees (angle) { //radians to degrees converter
             return angle * (180 / Math.PI);
         }
         //Mouse events
@@ -603,9 +571,8 @@ function chordDiagramMain() {
         var selectedNodeId = null;
 
         function mouseover(d) {
-            hoveredKey = d.key;
-            if (!chord.magnifyNamesConditionBox) {
-                // console.log(d.key);
+            hoveredKey = d.key; //mark which one is hovered over
+            if (!chord.magnifyNamesConditionBox) { //apply class if distortion code doesn't already
                 svg.selectAll("path.link.target-" + d.key)
                     .classed("target", true);
                 svg.selectAll("path.link.source-" + d.key)
@@ -614,8 +581,8 @@ function chordDiagramMain() {
         }
 
         function mouseout(d) {
-            hoveredKey = null;
-            if (!chord.magnifyNamesConditionBox) {
+            hoveredKey = null; //mark no name as hovered over
+            if (!chord.magnifyNamesConditionBox) {//remove class if distortion code doesn't already
                 svg.selectAll("path.link.source-" + d.key)
                     .classed("source", false);
                 svg.selectAll("path.link.target-" + d.key)
@@ -624,8 +591,8 @@ function chordDiagramMain() {
         }
         function deselectNode() {
             var d = currentNode;
-            selectedNodeId = null;
-            if (d !== null) {
+            selectedNodeId = null; //deselect
+            if (d !== null) { //remove selection class
                 svg.selectAll("path.link.target-" + d.key)
                     .classed("selected", false)
                     .each(updateNodes("source", "selected", null));
@@ -634,15 +601,14 @@ function chordDiagramMain() {
                     .each(updateNodes("target", "selected", null));
             }
         }
-        // var keepD = null;
-        function click(d) {
+        function click(d) { //select person clicked on in controller panel
             controller.selectEnslavedPerson(d.data);
         }
         chord.selectNodeWithData = function(data) {
-            deselectNode();
-            var node = findNodeWithId(data.id);
+            deselectNode(); //deselect current node
+            var node = findNodeWithId(data.id); //find the node with id
 
-            var nodeToSelect = svg.selectAll("text")[0].filter(function (d) {
+            var nodeToSelect = svg.selectAll("text")[0].filter(function (d) { //find the node in the DOM
                 if (d.__data__.data)
                     return d.__data__.data.id === data.id;
                 else
@@ -650,7 +616,7 @@ function chordDiagramMain() {
 
             });
 
-            if (nodeToSelect && nodeToSelect.length > 0) {
+            if (nodeToSelect && nodeToSelect.length > 0) { //apply class to node to mark as selected
                 nodeToSelect = nodeToSelect[0];
 
                 svg.selectAll("path.link.target-" + node.key)
@@ -664,10 +630,10 @@ function chordDiagramMain() {
             currentNode = node;
             selectedNodeId = node.data.id;
         };
-        chord.deselectAllNodes = function() {
+        chord.deselectAllNodes = function() { //deselect - make public
             deselectNode();
         };
-        function findNodeWithId(id) {
+        function findNodeWithId(id) { //find a node with id within the allData data structure
             for (var nodeId in allData) {
                 var node = allData[nodeId];
                 if (node.data.id === id) {
@@ -676,13 +642,13 @@ function chordDiagramMain() {
             }
             return null;
         }
-        function updateNodes(name, className, value, node) {
+        function updateNodes(name, className, value, node) { //update a node with new classes and values
             return function(d) {
                 if (value) this.parentNode.appendChild(value);
                 svg.select("#node-" + d[name].key + "-" + name).classed(className, value);
             };
         }
-        function findStartAngle(children) {
+        function findStartAngle(children) { //find start angle based on smallest degree posiiton
             var min = children[0].x;
             children.forEach(function(d) {
                 if (d.x < min)
@@ -690,7 +656,7 @@ function chordDiagramMain() {
             });
             return min;
         }
-        function findEndAngle(children) {
+        function findEndAngle(children) {//find end angle based on largest degree posiiton
             var max = children[0].x;
             children.forEach(function(d) {
                 if (d.x > max)
@@ -699,25 +665,12 @@ function chordDiagramMain() {
             return max;
         }
     }
-    function getAllDataCopy() {
+    function getAllDataCopy() { //Create a deep copy of data
         var rawData = csvData.map(function(p) {p.id = Number(p.id); return p;});
         return processData(rawData);
     }
-    function resetCSVData() {
+    function resetCSVData() { //Creat fresh copy of csv data
         csvData = csvJSON(originalData).map(function(p) {p.id = Number(p.id); return p;});
-        //sort to group by buyer data
-        // csvData.sort(function (a, b) {
-        //     if (a.buyer_name > b.buyer_name) {
-        //         return 1
-        //     }
-        //     else if (a.buyer_name == b.buyer_name) {
-        //         if (a.farm_name > b.farm_name)
-        //             return -1;
-        //         return 1
-        //     }
-        //     else
-        //         return -1;
-        // });
 
         //sort by family
         csvData.sort(function (a, b) {
@@ -727,6 +680,8 @@ function chordDiagramMain() {
             return -1;
         });
         var counter = 1;
+
+        //Add the letter a a bunch of times to the front so that the names will be in the correct order around the circle
         csvData.forEach(function (p) {
             var news = "";
             for (var i = 0; i < counter; i++)
@@ -735,7 +690,7 @@ function chordDiagramMain() {
             counter += 1;
         });
     }
-    function runFilter(dataToFilter, filter) {
+    function runFilter(dataToFilter, filter) { //apply filter to data
         var names = filter.map(function(d) {return d.name});
 
         var newData = dataToFilter;
@@ -749,7 +704,7 @@ function chordDiagramMain() {
         });
         return newData;
     }
-    function getLocationTitleFor(title) {
+    function getLocationTitleFor(title) { //Covert title id to real title
         if (title === "HenryJohnson")
             return "Chatham";
         else if (title === "WhiteMarsh")

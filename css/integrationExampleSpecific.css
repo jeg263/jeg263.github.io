@@ -1,0 +1,164 @@
+/*Title Page*/
+.title-label {
+    font-size: 30px !important;
+}
+.title-header-label {
+    font-size: 70px !important;
+}
+/*Time-line specific - but mine*/
+.section2 {
+    height: auto !important;
+    /*height: 350VH !important;*/
+    position: relative;
+    overflow: visible !important;
+}
+/*Nav Bar*/
+.nav-bar {
+    width: 100%;
+    display: inline-block;
+}
+.nav-bar-links-container .link-item a:hover {
+    color: inherit;
+    text-decoration: none;
+}
+.nav-bar-links-container {
+    display: inline-block;
+    float: right;
+    margin: 15px 20px;
+    cursor: pointer;
+}
+.link-item {
+    display: inline-block;
+    float: left;
+    margin-left: 30px;
+}
+.link-item a {
+    color: white;
+}
+/*Time-line specific css - Sabrina*/
+h1 {
+    font-size: 70px;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 400;
+    letter-spacing: 5px;
+}
+
+h2 {
+    font-size: 30px;
+    margin: 0px 0px 0px 0px;
+}
+
+.top {
+    letter-spacing: 2.4px;
+}
+
+p {
+    margin: 0px 0px 0px 0px;
+}
+
+.content {
+    text-align: center;
+    padding-top: 21%;
+    font-family: 'IM Fell English SC', serif;
+    /*color: black;*/
+    color: white;
+    text-shadow: 0px 1px 1px rgba(0,0,0,0.1),
+    0px 1px 1px rgba(0,0,0,0.1),
+    0px 1px 1px rgba(0,0,0,0.1);
+}
+
+.row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+
+
+
+ul.timeline-dates {
+    width: 10%;
+    list-style-type: none;
+    float: left;
+    height: 100VH;
+}
+
+li.year {
+    margin: 5px 5px 5px -42px;
+    font-size: 1.4em;
+    font-weight: 800;
+}
+
+li.line {
+    padding: 0px;
+    margin-left: -18px;
+    border-left: 1px dashed grey;
+}
+
+li.date {
+    /*font-size: 1.6em;*/
+}
+
+li.short-line {
+    height: calc(2% * (350/100));
+}
+
+li.long-line {
+    height: calc(6.3% * (350/100));
+}
+
+.date  {
+    display: block;
+    width: 15px;
+    height: 15px;
+    margin: 5px 5px 5px -24px;
+    background: url(../images/circle.svg) no-repeat center;
+    opacity: 0.5;
+    background-size: 13px 13px;
+    cursor: pointer;
+    transition: opacity 0.4s;
+}
+.date-container {
+    width: 35%;
+    /*margin: 0% 10% 10% 20%;*/
+    /*margin-left: 15%;*/
+    float:left;
+    font-size: 1.4em;
+    font-weight: 500;
+    font-family: 'IM Fell Double Pica', serif;
+    position: relative;
+}
+.date-dot-label {
+    display: none;
+    margin-left: 20px;
+    color: black;
+    font-size: 0.9em;
+}
+#timeline {
+    width: 10%;
+    margin-left: 5%;
+    height: 100VH;
+}
+
+.fixed {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    float: left;
+}
+/*a {*/
+/*color: #f2f2f2;*/
+/*}*/
+
+/*a {*/
+/*color: #337ab7;*/
+/*text-decoration: none;*/
+/*}*/
+/*a {*/
+/*background-color: transparent;*/
+/*}*/
+
+
+p.blank {
+    height: calc(12VH * (350 / 100));
+}

@@ -15,92 +15,48 @@ function controllerMain() {
     var searchWithinFilterConditions = false;
     //filter control actions
     $(function(){
-        // var showChord = true;
-        // var showMap = false;
-        // var familySearchTerm = "";
-        // selectPersonSearchTerm = "";
-        // var ageSearchTerm = "";
-        // var showSidebar = true;
-        // var ageFilterOption = "greaterThan";
-        // var plantationFilterOption = "any";
-        // var buyerFilterOption = "any";
-        // var genderFilterOption = "any";
-        // var filterKatharineJackson = false;
-        // var searchWithinFilterConditions = false;
-
-//         var tour = new Tour({
-//             steps: [
-//                 {
-//                     element: "#rightButton",
-//                     title: "Exam Enrolment",
-//                     content: "First let's enrol to an exam"
-//                 }
-//             ],
-//
-//             // backdrop: true,
-//             // storage: false
-//         });
-//
-// // Clear session data
-//         localStorage.clear();
-//
-// // Initialize the tour
-//         tour.init();
-//
-// // Start the tour
-//         tour.start();
-
-        $("#selectButton").click(function(result){
-            var personData = chord.getAllData().filter(function(data) {
+        $("#selectButton").click(function(result){ //triggered when selecting a person
+            var personData = chord.getAllData().filter(function(data) { //find selected person
                 if (data.data.full_name.substr(data.data.full_name.indexOf(" ") + 1) === selectPersonSearchTerm)
                     return true;
                 return false;
             });
             if (personData && personData.length > 0)
-                controller.selectEnslavedPerson(personData[0].data);
+                controller.selectEnslavedPerson(personData[0].data); //select person
             else
-                controller.deselectEnslavedPerson();
+                controller.deselectEnslavedPerson(); //if person doesn't exist deselect
         });
-        $("#familyButton").click(function(result){
-            controller.deselectEnslavedPerson();
-            var combinedFilter = getCombinedFilter();
-            chord.refreshVisualization(combinedFilter);
-            updateFilterConditionsForSelect();
-
-            // if (familyArray.length > 0) {
-            //     var directFamilyLineFilter = function (p) {
-            //         return containsObject(p.id, familyArray) };
-            //     chord.refreshVisualization(directFamilyLineFilter); }
-            // else if (textValue === "")
-            //     chord.refreshVisualization(null, true);
-            // else
-            //     chord.refreshVisualization(null);
+        $("#familyButton").click(function(result){ //filter results
+            controller.deselectEnslavedPerson(); //deselect first
+            var combinedFilter = getCombinedFilter(); //build filter
+            chord.refreshVisualization(combinedFilter); //refresh visualization using filter
+            updateFilterConditionsForSelect(); //Update filter conditions
         });
-        $("#chordSelector").change(function(result){
+        $("#chordSelector").change(function(result){ //if chaning to root wheel display it
             showChord = true;
             showMap = false;
             showHidePanels();
         });
-        $("#mapSelector").change(function(result){
+        $("#mapSelector").change(function(result){ //display map
             // if (enjoyhint_instance)
             //     enjoyhint_instance.trigger('next');
             showChord = false;
             showMap = true;
             showHidePanels();
         });
-        $("#familySelector").change(function(result){
+        $("#familySelector").change(function(result){ //show family tree
             showChord = false;
             showMap = false;
             showHidePanels();
         });
-        function showHidePanels() {
+        function showHidePanels() { //show panels based on what is selected
             d3v2.select("#bundle").classed("hidden", !showChord);
             d3v2.select("#mapContainer").classed("hidden", !showMap);
             d3v2.select("#mapContainer").classed("opacity0", false);
 
             d3v2.select("#chordControlsContainer").classed("hidden", !showChord);
         }
-        $('#move-button').mousedown(function() {
+        $('#move-button').mousedown(function() { //EIther open or close stage (toggles it)
             showSidebar = !showSidebar;
             d3v2.select("#left-container").classed("stage-shrink", showSidebar);
             d3v2.select("#right-container").classed("stage-open", showSidebar);
@@ -109,21 +65,14 @@ function controllerMain() {
 
             d3v2.select("#rightButton").classed("open-button", showSidebar);
             d3v2.select("#leftButton").classed("open-button", !showSidebar);
-        d3v2.select("#rightButton").classed("close-button", !showSidebar);
-        d3v2.select("#leftButton").classed("close-button", showSidebar);
-
-            // if (showSidebar) {
-            //
-            // else {
-            //     d3v2.select("#rightButton").attr("display", "none !important");
-            //     d3v2.select("#leftButton").attr("display", "block !important");
-            // }
+            d3v2.select("#rightButton").classed("close-button", !showSidebar);
+            d3v2.select("#leftButton").classed("close-button", showSidebar);
         });
-        $('#otherCheckbox').click(function() {
+        $('#otherCheckbox').click(function() { //checkbox for showing other data selected
             chord.showOtherData = !chord.showOtherData;
             chord.refreshVisualization(null, true);
         });
-        $("#resetButton").click(function () {
+        $("#resetButton").click(function () { //set all variables (except multiplier)
             // chord.multiplier = 0.9;
             selectPersonSearchTerm = "";
             familySearchTerm = "";
@@ -141,40 +90,40 @@ function controllerMain() {
             $("#dropdownMenuButton").html("Greater than");
             $("#dropdownPlantationButton").html("Any");
 
-            controller.deselectEnslavedPerson();
+            controller.deselectEnslavedPerson(); //de-select person and reset data
             var combinedFilter = getCombinedFilter();
             chord.refreshVisualization(combinedFilter);
             updateFilterConditionsForSelect();
 
         });
         $('#inputAge').keyup(function(){
-            ageSearchTerm = $("#inputAge").val();
+            ageSearchTerm = $("#inputAge").val(); //get age as typed
         });
         $('#inputAge').change(function() {
-            ageSearchTerm = $("#inputAge").val();
+            ageSearchTerm = $("#inputAge").val(); //get age as typed
             updateFilterConditionsForSelect();
         });
         $('#inputFamily').keyup(function(){
-            familySearchTerm = $("#inputFamily").val();
+            familySearchTerm = $("#inputFamily").val(); //get family filter characters as typed
         });
         $('#inputFamily').change(function() {
-            familySearchTerm = $("#inputFamily").val();
+            familySearchTerm = $("#inputFamily").val(); //get family filter as typed
             updateFilterConditionsForSelect();
         });
         $('#selectPerson').keyup(function(){
-            selectPersonSearchTerm = $("#selectPerson").val();
+            selectPersonSearchTerm = $("#selectPerson").val(); //get name of person to select as typed
         });
         $('#selectPerson').change(function() {
-            selectPersonSearchTerm = $("#selectPerson").val();
+            selectPersonSearchTerm = $("#selectPerson").val(); //get name of person to select as typed
         });
-        d3v2.select("input[type=range]").on("change", function() {
+        d3v2.select("input[type=range]").on("change", function() { //change multiplier based on scale
             chord.multiplier = this.value / 100;
             chord.refreshVisualization(null);
         });
-        $(".diagram-container-right").css({
+        $(".diagram-container-right").css({ //set diagram container right height
             'height': ($(".diagram-container").height() + 'px')
         });
-    //    Dropdown Age
+    //    Dropdown Age - set based on selected option
         $('#dropdownOptionEquals').click(function () {
             ageFilterOption = "equals";
             $("#dropdownMenuButton").html("Equals");
@@ -190,7 +139,7 @@ function controllerMain() {
             $("#dropdownMenuButton").html("Less than");
             updateFilterConditionsForSelect();
         });
-    //    Dropdown Plantation
+    //    Dropdown Plantation - set based on selected option
         $('#dropdownOptionAnyPlantation').click(function () {
             plantationFilterOption = "any";
             $("#dropdownPlantationButton").html("Any");
@@ -216,7 +165,7 @@ function controllerMain() {
             $("#dropdownPlantationButton").html("Newtown");
             updateFilterConditionsForSelect();
         });
-    //    Dropdown Buyer
+    //    Dropdown Buyer - set based on selected option
         $('#dropdownOptionAnyBuyer').click(function () {
             buyerFilterOption = "any";
             $("#dropdownBuyerButton").html("Any");
@@ -237,7 +186,7 @@ function controllerMain() {
             $("#dropdownBuyerButton").html("Other");
             updateFilterConditionsForSelect();
         });
-    //    Gender
+    //    Gender - set based on selected option
         $('#dropdownOptionAnyGender').click(function () {
             genderFilterOption = "any";
             $("#dropdownGenderButton").html("Any");
@@ -253,25 +202,27 @@ function controllerMain() {
             $("#dropdownGenderButton").html("Female");
             updateFilterConditionsForSelect();
         });
-    //    Katerine Jackson checkbox
+    //    Katerine Jackson checkbox - set based on action
         $('#katharineJacksonCheck').click(function() {
             filterKatharineJackson = !filterKatharineJackson;
             updateFilterConditionsForSelect();
         });
         $( "#katharineJacksonCheck" ).prop( "checked", filterKatharineJackson );
-    //    Search Filter Conditions
+    //    Search Filter Conditions - set based on action
         $('#searchWithinFilterConditionsCheck').click(function() {
             searchWithinFilterConditions = !searchWithinFilterConditions;
             updateFilterConditionsForSelect();
         });
         $( "#searchWithinFilterConditionsCheck" ).prop( "checked", searchWithinFilterConditions );
+
+        //Magnify checkbox - set based on action
         chord.magnifyNamesConditionBox = true;
         $('#magnifyNamesConditionBox').click(function() {
             chord.magnifyNamesConditionBox = !chord.magnifyNamesConditionBox;
         });
         $( "#magnifyNamesConditionBox" ).prop( "checked", chord.magnifyNamesConditionBox );
     });
-    function getCombinedFilter() {
+    function getCombinedFilter() { //build filter for data based on options on right side
         var ageFilter = function (p) {
             if (ageSearchTerm === "")
                 return true;
@@ -317,12 +268,12 @@ function controllerMain() {
             return (familyArray.length > 0 && familySearchTerm !== "") ? containsObject(p.id, familyArray) : true;
         };
 
-        var combinedFilter = function (p) {
+        var combinedFilter = function (p) { //build a filter function that is a combination of all the others above
             return ageFilter(p) && genderFilter(p) && directFamilyLineFilter(p) && buyerFilter(p) && plantationFilter(p);
         };
         return combinedFilter;
     }
-    function updateFilterConditionsForSelect() {
+    function updateFilterConditionsForSelect() { //on filter conditions update - reset names for autocompletes and reset all input variables to be ""
         csvData = csvJSON(chord.originalData).map(function(p) {p.id = Number(p.id); return p;});
 
         var combinedFilter = getCombinedFilter();
@@ -338,7 +289,7 @@ function controllerMain() {
             $("#selectPerson").typeahead('destroy').typeahead({ source:names });
         }
     }
-    function setFilterControlVariables() {
+    function setFilterControlVariables() { //set intial filter variables
         //typeahead family filter
         csvData = csvJSON(chord.originalData).map(function(p) {p.id = Number(p.id); return p;});
         var names = csvData.map(function(p) {return p.full_name});
@@ -348,31 +299,31 @@ function controllerMain() {
         $( "#otherCheckbox" ).prop( "checked", chord.showOtherData );
         updateFilterConditionsForSelect();
     }
-    controller.onDataLoad = function() {
+    controller.onDataLoad = function() { //on data load for first time hide map and get family data
         d3v2.select("#mapContainer").classed("hidden", true);
         d3v2.select("#mapContainer").classed("opacity0", true);
         family.processFamilyData();
         setFilterControlVariables();
     };
-    controller.selectEnslavedPerson = function(personData) {
+    controller.selectEnslavedPerson = function(personData) { //select person
         // if (enjoyhint_instance)
         //     enjoyhint_instance.trigger('next');
-        var name = personData.full_name.substr(personData.full_name.indexOf(" ") + 1);
+        var name = personData.full_name.substr(personData.full_name.indexOf(" ") + 1); //get persons name to set to text of input
         selectPersonSearchTerm = name;
         $("#selectPerson").val(name);
-        mapData.mapDestinationPlantation = personData.destination;
+        mapData.mapDestinationPlantation = personData.destination; //get data based on selection
         mapData.mapSourcePlantation = personData.origin;
-        mapData.updateMap();
-        chord.selectNodeWithData(personData);
+        mapData.updateMap(); //update map
+        chord.selectNodeWithData(personData); //update roots wheel
     };
     controller.deselectEnslavedPerson = function() {
-        $("#selectPerson").val("");
+        $("#selectPerson").val(""); //undo all data and update visualizations
         mapData.mapDestinationPlantation = "";
         mapData.mapSourcePlantation = "";
         mapData.updateMap();
         chord.deselectAllNodes();
     };
-    controller.didUpdateMultiplier = function () {
+    controller.didUpdateMultiplier = function () { //on multiplier change change slider value to keep in line with actual multiplier
         $(document).ready(function() {
             document.getElementById("multiplierRange").value = chord.multiplier * 100;
         });

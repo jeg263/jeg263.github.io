@@ -1,132 +1,20 @@
-body {
-    font: 300 36px "Helvetica Neue";
-    height: 640px;
-    /*margin: 80px 160px 80px 160px;
-    overflow: hidden;*/
-    position: relative;
-}
-
-/*a:link, a:visited {*/
-    /*color: #777;*/
-    /*text-decoration: none;*/
-/*}*/
-
-/*a:hover {*/
-    /*color: #666;*/
-/*}*/
-
-blockquote {
-    margin: 0;
-}
-
-blockquote:before {
-    content: "“";
-    position: absolute;
-    left: -.4em;
-}
-
-blockquote:after {
-    content: "”";
-    position: absolute;
-}
-
-body > ul {
-    margin: 0;
-    padding: 0;
-}
-
-/*h1 {*/
-    /*font-size: 64px;*/
-/*}*/
-
-/*h1, h2, h3 {*/
-    /*font-weight: inherit;*/
-    /*margin: 0;*/
-/*}*/
-
-/*h2, h3 {*/
-    /*text-align: right;*/
-    /*font-size: inherit;*/
-    /*position: absolute;*/
-    /*bottom: 0;*/
-    /*right: 0;*/
-/*}*/
-
-/*h2 {*/
-    /*font-size: 24px;*/
-    /*position: absolute;*/
-    /*right: 50px;*/
-/*}*/
-
-/*h3 {*/
-    /*bottom: -20px;*/
-    /*font-size: 18px;*/
-/*}*/
-
-.invert {
-    background: #1f1f1f;
-    color: #dcdccc;
-}
-
-.invert h2, .invert h3 {
-    color: #7f9f7f;
-}
-
-.string, .regexp {
-    color: #f39;
-}
-
-.keyword {
-    color: #00c;
-}
-
-.comment {
-    color: #777;
-    font-style: oblique;
-}
-
-.number {
-    color: #369;
-}
-
-.class, .special {
-    color: #1181B8;
-}
-
-body > svg {
-    position: absolute;
-    top: -80px;
-    left: -160px;
-}
-/*1838 census*/
-/*Bills sale Batey - west Oak, Johsnon - Chatem*/
-
-/*headers*/
+/*CSS - Root Wheel*/
 .group-WhiteMarsh {
-    /*fill: rgb(31, 119, 180);*/
-    /*fill: #0077C5;*/
-    /*fill: #055393;*/
     fill: #0077C5;
 }
 .group-StThomassManor {
-    /*fill: #ECD912;*/
     fill: #FFDC12;
 }
 .group-Newtown {
-    /*fill: rgb(162, 81, 191);*/
-    /*fill: #4E2B8F;*/
     fill: #008380;
 }
 .group-StInigoes {
-    /*fill: #C74747;*/
     fill: #D52B1E;
 }
 .group-HenryJohnson {
-    /*fill: rgb(255, 127, 14);*/
     fill: #FF8000;
 }
 .group-JesseBatey {
-    /*fill: rgb(44, 160, 44);*/
     fill: #53B447;
 }
 .group-KOther {
@@ -135,52 +23,18 @@ body > svg {
 .group-filler {
     fill: transparent;
 }
-/*.group-7, .group-8, .group-9, .group-10, .group-11, .group-12 {*/
-    /*fill: transparent;*/
-    /*!*stroke-dasharray: 13px 45.5px 12.5px 136.75;*!*/
-    /*!*stroke-width: 31px;*!*/
-    /*!*stroke: white;*!*/
-    /*!*stroke-dashoffset: -12;*!*/
-    /*!*stroke-dasharray: 14px 43.5px 13.5px 136.75;*!*/
-    /*!*stroke-width: 31px;*!*/
-    /*!*stroke: white;*!*/
-    /*!*stroke-dashoffset: -12;*!*/
-
-    /*stroke-dasharray: 16.5px 34.75px 16px 129.75;*/
-    /*stroke-width: 28px;*/
-    /*stroke: white;*/
-    /*stroke-dashoffset: -9;*/
-    /*!*fill: rgb(174, 199, 232);*!*/
-/*}*/
 .link.parent-JesseBatey {
     fill: none;
-    /*stroke: rgb(44, 160, 44);*/
     stroke: rgb(83, 180, 71);
 }
 .link.parent-HenryJohnson {
     fill: none;
-    /*stroke: rgb(255, 127, 14);*/
     stroke: rgb(255, 128, 0);
 }
 .link.parent-KOther {
     fill: none;
     stroke: rgba(122, 61, 216, 1);
 }
-.div {
-    stroke: rgb(255, 128, 0);
-    stroke: rgb(83, 180, 71);
-    stroke: rgb(83, 180, 71);
-    stroke: rgb(0, 131, 128);
-    stroke: rgb(186, 190, 197);
-    stroke: rgb(0, 119, 197);
-    stroke: rgb(33, 171, 246);
-}
-/*.link.parent-WhiteMarsh {*/
-    /*fill: none;*/
-    /*stroke: gray;*/
-/*}*/
-
-/*other styles*/
 .top-bar {
     width: 100%;
     height: 48px;
@@ -225,33 +79,10 @@ path.arc {
     /*cursor: move;*/
     fill: transparent;
 }
-/*.could-not-be-smaller {*/
-    /*font-size: 1px;*/
-/*}*/
-/*.super-super-tiny-small {*/
-    /*font-size: 2px;*/
-/*}*/
-/*.super-super-small .node {*/
-     /*font-size: 3px;*/
-/*}*/
-/*.super-small .node {*/
-    /*font-size: 4px;*/
-/*}*
-/*.small .node {*/
-    /*font-size: 6px;*/
-/*}*/
-/*.very-small .node {*/
-    /*font-size: 5px;*/
-/*}*/
-/*.node.default {*/
-    /*font-size: 5px;*/
-/*}*/
 .node.right-half {
     text-anchor: end;
 }
 .node {
-    /*font-size: 5px;*/
-    /*font-size: 7px;*/
     fill: rgb(171, 171, 171);
 }
 .node.target {
@@ -259,14 +90,7 @@ path.arc {
     font-weight: bold;
     cursor: pointer;
     z-index: 2;
-    /*fill: #1f77b4;*/
 }
-/*.node:hover {*/
-    /*fill: #d62728 !important;*/
-    /*font-weight: bold;*/
-    /*cursor: pointer;*/
-    /*!*fill: #1f77b4;*!*/
-/*}*/
 .link {
     fill: none;
     stroke: rgb(219, 219, 219);
@@ -304,7 +128,6 @@ path.arc {
     fill: white;
     font-weight: 400;
     letter-spacing: 1px;
-    /*font-family: sans-serif;*/
 }
 .arc-label.small-arc-label {
     font-size: 12px;
@@ -341,7 +164,6 @@ path.arc {
     flex-grow: 1 !important;
 }
 .sub-label {
-    /*color: #b7b7b7;*/
     color: #ced4da;
     display: inline-block;
     font-size: 10px;
@@ -355,25 +177,6 @@ path.arc {
     border-right: none;
     border-bottom-right-radius: 0;
 }
-/* magnifier glass as circle */
-.lens {
-    stroke: gray;
-    stroke-width: 2.0px;
-    stroke-opacity: 1;
-    fill: none;
-}
-.hidden {
-    display: none !important;
-}
-.opacity0 {
-    opacity: 0;
-}
-
-
-
-/*.location {*/
-    /*display: none;*/
-/*}*/
 .plantation-center {
     stroke: black;
 }
@@ -393,11 +196,7 @@ path.arc {
 .page {
     overflow: visible;
 }
-
-
-
-
-/*New css*/
+/*CSS Container Panels*/
 .right-container {
     position: absolute;
     right: 0;
@@ -406,7 +205,6 @@ path.arc {
     height: 100%;
     padding: 20px;
     float: right;
-    /*box-shadow: 0px 0px 0 #d4d7dc, -1px 0px 0px #eceef1, 1px 0px 0 #eceef1;*/
     box-shadow: 0px 0px 0 #e3eaf3, -1px 0px 0px #e3eaf3, 1px 0px 0 #e3eaf3;
 }
 .arrow-container {
@@ -417,8 +215,7 @@ path.arc {
     margin-right: 15px;
     height: 24px;
     width: 27px;
-    border: none;
-    border: 1px solid #eceef1;
+    border: 1px solid #e3eaf3;
     border-radius: 0 0 2px 2px;
     background-position: -80px -20px;
     background-size: 144px;
@@ -428,26 +225,7 @@ path.arc {
     left: -27px;
     border-right: none;
     /* border-top: none; */
-    border-color: #e3eaf3;
 }
-/*.arrow-container {*/
-    /*cursor: pointer;*/
-    /*position: absolute;*/
-    /*bottom: -24px;*/
-    /*right: -30px;*/
-    /*margin-right: 15px;*/
-    /*height: 24px;*/
-    /*width: 27px;*/
-    /*border: none;*/
-    /*border: 1px solid #e3eaf3;*/
-    /*border-radius: 0 0 2px 2px;*/
-    /*background-position: -80px -20px;*/
-    /*background-size: 144px;*/
-    /*background-color: #f3f5f8;*/
-    /*outline: none;*/
-    /*top: 0;*/
-    /*left: -27px;*/
-/*}*/
 .right-button {
     font-size: 19px;
     line-height: 26px;
@@ -456,42 +234,26 @@ path.arc {
     text-align: center;
     color: #007aff;
 }
-.stage-close, .stage-open {
-    /*transition: width .2s linear .1s;*/
-}
 .stage-grow {
     width: 100% !important;
     transition: width 300ms linear;
-    /*-webkit-transform: scale(2, 0);*/
-    /*transform: scale(2, 0);*/
-    /*transition: transform 300ms linear;*/
-    /*will-change: transform;*/
 }
 .stage-shrink {
     width: 60% !important;
     transition: width 300ms linear;
-    /*-webkit-transform: scale(2, 0);*/
-    /*transform: scale(2, 0);*/
-    /*transition: transform 300ms linear;*/
-    /*will-change: transform;*/
 }
 .stage-close {
     -webkit-transform: translateX(100%);
     transform: translateX(100%);
     transition: transform 300ms linear;
     will-change: transform;
-    /*width: 0%;*/
-    /*height: 65px!important;*/
 }
 .stage-open {
     -webkit-transform: translateX(0%);
     transform: translateX(0%);
     transition: transform 300ms linear;
     will-change: transform;
-    /*width: 40%;*/
-    /*height: 206px!important;*/
 }
-
 .open-button {
     display: block !important;
 }
@@ -502,203 +264,22 @@ path.arc {
     height: 100%;
     width: 100%;
 }
-/*#cover {*/
-    /*background: black;*/
-    /*!*background: url(../images/bacg);*!*/
-    /*!*background: url(../images/00georgetown9-superJumbo.jpg);*!*/
-    /*!*background: url(../images/archivalimage.png);*!*/
-    /*!*opacity: 0.60;*!*/
-    /*!*z-score: 99;*!*/
-    /*!*filter: alpha(opacity=90); !* For IE8 and earlier *!*/
-/*background-size: cover;				!* Adjust size *!*/
-    /*background-position: center;	!* Adjust position *!*/
-    /*!*font-family: "Lato" !important;*!*/
-    /*color: black;*/
-/*}*/
-
-
-h1 {
-    font-weight: 700;
-    /*font-size: 5em;*/
-    font-size: 70px;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
-    Helvetica, Arial, "Lucida Grande", sans-serif;
-    /*font-style: bold;*/
-    font-weight: 400;
-    letter-spacing: 5px;
-    /*font-family: 'IM Fell Double Pica', serif;*/
-}
-
-h2 {
-    font-size: 30px;
-    margin: 0px 0px 0px 0px;
-}
-
-.top {
-    letter-spacing: 2.4px;
-}
-
-p {
-    margin: 0px 0px 0px 0px;
-}
-
-.content {
-    text-align: center;
-    padding-top: 21%;
-    font-family: 'IM Fell English SC', serif;
-    /*color: black;*/
-    color: white;
-    text-shadow: 0px 1px 1px rgba(0,0,0,0.1),
-    0px 1px 1px rgba(0,0,0,0.1),
-    0px 1px 1px rgba(0,0,0,0.1);
-}
-
-.row {
-    margin-left: 0px;
-    margin-right: 0px;
-}
-
-
-
-
-ul.timeline-dates {
-    width: 10%;
-    list-style-type: none;
-    float: left;
-    height: 100VH;
-}
-
-li.year {
-    margin: 5px 5px 5px -42px;
-    font-size: 1.4em;
-    font-weight: 800;
-}
-
-li.line {
-    padding: 0px;
-    margin-left: -18px;
-    border-left: 1px dashed grey;
-}
-
-li.date {
-    /*font-size: 1.6em;*/
-}
-
-li.short-line {
-    height: calc(2% * (350/100));
-}
-
-li.long-line {
-    height: calc(6.3% * (350/100));
-}
-
-.date  {
-    display: block;
-    width: 15px;
-    height: 15px;
-    margin: 5px 5px 5px -24px;
-    background: url(../images/circle.svg) no-repeat center;
-    opacity: 0.5;
-    background-size: 13px 13px;
-    cursor: pointer;
-    transition: opacity 0.4s;
-}
-.date-container {
-    width: 35%;
-    /*margin: 0% 10% 10% 20%;*/
-    /*margin-left: 15%;*/
-    float:left;
-    font-size: 1.4em;
-    font-weight: 500;
-    font-family: 'IM Fell Double Pica', serif;
-    position: relative;
-}
-#timeline {
-    width: 10%;
-    margin-left: 5%;
-    height: 100VH;
-}
-
-.fixed {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    float: left;
-}
-/*a {*/
-    /*color: #f2f2f2;*/
-/*}*/
-
-/*a {*/
-    /*color: #337ab7;*/
-    /*text-decoration: none;*/
-/*}*/
-/*a {*/
-    /*background-color: transparent;*/
-/*}*/
-
-.section2 {
-    height: auto !important;
-    /*height: 350VH !important;*/
-    position: relative;
-    overflow: visible !important;
-}
-p.blank {
-    height: calc(12VH * (350 / 100));
-}
+/*Header Bar*/
 .header-bar {
     position: fixed;
     width: 100%;
-    /*height: 47px;*/
     height: 54px;
-    /*height: 3.35rem;*/
     top: 0;
     z-index: 5;
-    /*background: white;*/
     background: #393a3d;
     display: none;
     box-shadow: 0 4px 4px rgba(0,0,0,0.06);
     color: white;
-    /*border-bottom: 1px solid #ccc;*/
-}
-.title-label {
-    font-size: 30px !important;
-}
-.title-header-label {
-    font-size: 70px !important;
-}
-.date-dot-label {
-    display: none;
-    margin-left: 20px;
-    color: black;
-    font-size: 0.9em;
-}
-.nav-bar {
-    width: 100%;
-    display: inline-block;
-}
-.nav-bar-links-container {
-    display: inline-block;
-    float: right;
-    margin: 15px 20px;
-    cursor: pointer;
-}
-.link-item {
-    display: inline-block;
-    float: left;
-    margin-left: 30px;
-}
-.link-item a {
-    color: white;
 }
 .header-bar-title {
-    /*font-family: 'IM Fell English SC', serif;*/
     font-size: 32px;
 }
-/*::-webkit-scrollbar {*/
-    /*width: 0px;*/
-    /*background: transparent; !* make scrollbar transparent *!*/
-/*}*/
+/*Fake-time-line*/
 .fake-timeline-container {
     width: 10%;
     list-style-type: none;
@@ -706,9 +287,6 @@ p.blank {
     height: 100%;
 }
 li.fake-line {
-    /*padding: 0px;*/
-    /*margin-left: -18px;*/
-    /*border-left: 1px dashed grey;*/
     height: 100%;
 }
 .fake-timeline-super-container {
@@ -717,7 +295,7 @@ li.fake-line {
     display: inline-block;
     height: 100%;
 }
-
+/*CSS - dropdown*/
 .dropdown.open .dropdown-menu {
     display: inline-block;
     top: calc(100% + 3px);
@@ -736,47 +314,7 @@ li.fake-line {
     border-color: #ced4da;
     color: #495056;
 }
-.nav-bar-links-container .link-item a:hover {
-    color: inherit;
-    text-decoration: none;
-}
-.popover.tour-tour.tour-tour-0.fade {
-    opacity: 1;
-}
-.typeahead.dropdown-menu {
-    z-index: 1200;
-}
-.full-screen-modal {
-    width: 100VW;
-    height: 100VH;
-    /*background-color: rgba(0, 0, 0, 0.4);*/
-    background: black;
-    opacity: 0.6;
-    position: absolute;
-    z-index: 1000;
-}
-.hidden-modal {
-    display: none;
-}
-.welcome-modal-screen {
-    width: 50VW;
-    height: 50VH;
-    top: 35%;
-    background: white;
-    left: 25%;
-    position: absolute;
-    z-index: 1200;
-    padding: 40px;
-}
-.welcome-title {
-    font-size: 20px;
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-}
-.enjoyhint_close_btn {
-    display: none !important;
-}
+/*Map warning messages when displaying person with other destination or when no selected person*/
 .map-other-label {
     /*position: absolute;*/
     font-size: 1rem;
@@ -798,13 +336,6 @@ li.fake-line {
 }
 .no-map-data-container {
     background: black;
-    opacity: 0.6;
-    top: 0;
-    width: 100%;
-    left: 0;
-    height: 100%;
-    z-index: 20;
-    display: inline-block;
     font-size: 1rem;
     color: black;
     height: 100%;
@@ -826,4 +357,11 @@ li.fake-line {
     margin-top: 35%;
     width: 100%;
     text-align: center;
+}
+/*CSS to hide divs*/
+.hidden {
+    display: none !important;
+}
+.opacity0 {
+    opacity: 0;
 }

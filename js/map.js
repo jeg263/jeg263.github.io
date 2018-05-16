@@ -1,6 +1,7 @@
 // var mapData = {mapSVG: null, plantationData: null, plantationSelection: null, projection: null};
 var mapData = {mapSourcePlantation: null, mapDestinationPlantation: null};
 function mapMain() {
+    //calculate initial widths and heights of div
     var mapSourcePlantation = "";
     var mapDestinationPlantation = "";
 
@@ -10,8 +11,6 @@ function mapMain() {
 
     var width = d3.select("#history")._groups[0][0].clientWidth * 0.50;
     var height = d3.select("#history")._groups[0][0].clientHeight / 3;
-
-    // var width = height = 500;
 
     // D3 Projection
     var projection = d3.geoAlbersUsa()
@@ -48,26 +47,14 @@ function mapMain() {
             .style("stroke", "#fff")
             .style("stroke-width", "1")
             .style("fill", "#b6babd");
-
-        // svg.selectAll("circle")
-        // 	.data(plantationData)
-        // 	.enter()
-        // 	.append("circle")
-        // 	.attr("cx", function(d) {
-        // 		return projection([d.lon, d.lat])[0];
-        // 	})
-        // 	.attr("cy", function(d) {
-        // 		return projection([d.lon, d.lat])[1];
-        // 	})`
-        // });
     });
 
-    d3.json("data/plantation-location.json", function(data) {
+    d3.json("data/plantation-location.json", function(data) { //load map data
         plantationData = data;
-        plantationData = plantationData.map(function(d) { d.originalName = d.name; d.name = cleanName(d.name); return d});
+        plantationData = plantationData.map(function(d) { d.originalName = d.name; d.name = cleanName(d.name); return d}); //get plantation names
         mapSVG = d3.select(".map");
 
-        plantationSelection = d3.select(".map")
+        plantationSelection = d3.select(".map") //hide anything that is not a plantation (i.e. Georgetown)
             .selectAll('g')
             .data(plantationData)
             .enter()
@@ -83,9 +70,9 @@ function mapMain() {
         var x = -20,
             y = -20;
 
-        var colors = ["#FF8000","#0077C5","#FFDC12","#008380","#D52B1E","#53B447"];
+        var colors = ["#FF8000","#0077C5","#FFDC12","#008380","#D52B1E","#53B447"]; //colors for plantations
 
-        plantationSelection
+        plantationSelection //create plantations
             .append("text")
             .text(function(d) {
                 return d.originalName;
@@ -116,19 +103,12 @@ function mapMain() {
             .attr("cy", function(d) {
                 return projection([d.lon, d.lat])[1];
             })
-            // .attr("r", function(d) {
-            //     console.log(d);
-            //     return d.count * 0.08;
-            // })
             .attr("r", 5)
             .attr("stroke", function(d, i) {
                 return "white";})
             .attr("fill", function(d, i) {
                 return colors[i % colors.length];
             })
-
-
-            // plantationSelection
             .append("svg:image")
             .attr("class", function(d) {
                 if (d.name !== "GeorgetownUniversity") {
@@ -144,30 +124,25 @@ function mapMain() {
             .attr('width', imgWidth)
             .attr('height', imgHeight)
             .attr("xlink:href", "images/pin.svg");
-        // .attr("display", "none")
 
         mapData.mapSVG = mapSVG;
         mapData.plantationData = plantationData;
         mapData.plantationSelection = plantationSelection;
     });
     mapData.updateMap = function() {
-        var colors = ["#FF8000","#0077C5","#FFDC12","#008380","#D52B1E","#53B447"];
-        // var mapSVG = mapData.mapSVG;
-        // var plantationData = mapData.plantationData;
-        // var plantationSelection = mapData.plantationSelection;
-        // var projection = mapData.projection;
+        var colors = ["#FF8000","#0077C5","#FFDC12","#008380","#D52B1E","#53B447"]; //colors for map
         mapSourcePlantation = mapData.mapSourcePlantation;
         mapDestinationPlantation = mapData.mapDestinationPlantation;
 
-        mapSVG.selectAll("#migrationPath").remove();
-        mapSVG.selectAll("#migrationPathPortions").remove();
+        mapSVG.selectAll("#migrationPath").remove(); //remove old path between source and destination
+        mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
 
         if (mapDestinationPlantation !== "") {
-            d3.select("#mapOtherLabel").classed("hidden-other-label", true);
+            d3.select("#mapOtherLabel").classed("hidden-other-label", true); //hide warning messages
             d3.select('#noMapData').classed("hidden-other-label", true);
 
             var destination = plantationData.find(function (d) {
-                if (mapDestinationPlantation === "HenryJohnson") {
+                if (mapDestinationPlantation === "HenryJohnson") { //Adjust names from buyers to plantation names
                     mapDestinationPlantation = "ChathamPlantation";
                 }
                 else if (mapDestinationPlantation === "JesseBatey") {
@@ -177,7 +152,7 @@ function mapMain() {
                     return d;
                 }
             });
-            var source = plantationData.find(function (d) {
+            var source = plantationData.find(function (d) { //find plantation with correct name
                 if (d.name === mapSourcePlantation) {
                     return d;
                 }
@@ -186,7 +161,7 @@ function mapMain() {
             var sourceIndex = plantationData.indexOf(source);
 
             plantationSelection.attr("class", function(d) {
-                if (d.name !== "GeorgetownUniversity" && d.name === mapDestinationPlantation || d.name === mapSourcePlantation) {
+                if (d.name !== "GeorgetownUniversity" && d.name === mapDestinationPlantation || d.name === mapSourcePlantation) { //exclude Georgetown
                     return "plantation";
                 }
                 else {
@@ -195,17 +170,23 @@ function mapMain() {
             });
 
 
-            var lineGenerator = d3.line()
+            var lineGenerator = d3.line() //start line drawing between two points
                 .curve(d3.curveCardinal);
 
-            var points = mapData.getCoordinatesForPath(mapSourcePlantation, mapDestinationPlantation);
+            var points = mapData.getCoordinatesForPath(mapSourcePlantation, mapDestinationPlantation); //get coordinates to draw points thorugh
 
             points = points.map(function (p) {
                 return projection(p)
             });
 
+
+            //
+            // Draw Gradient line
+            //
+
             var pathData = lineGenerator(points);
 
+            //Gradient line functions
             // Compute stroke outline for segment p12.
             function lineJoin(p0, p1, p2, p3, width) {
                 var u12 = perp(p1, p2),
@@ -226,14 +207,14 @@ function mapMain() {
                 }
                 return "M" + a + "L" + b + " " + c + " " + d + "Z";
             }
-// Compute intersection of two infinite lines ab and cd.
+            // Compute intersection of two infinite lines ab and cd.
             function lineIntersect(a, b, c, d) {
                 var x1 = c[0], x3 = a[0], x21 = d[0] - x1, x43 = b[0] - x3,
                     y1 = c[1], y3 = a[1], y21 = d[1] - y1, y43 = b[1] - y3,
                     ua = (x43 * (y1 - y3) - y43 * (x1 - x3)) / (y43 * x21 - x43 * y21);
                 return [x1 + ua * x21, y1 + ua * y21];
             }
-// Compute unit vector perpendicular to p01.
+            // Compute unit vector perpendicular to p01.
             function perp(p0, p1) {
                 var u01x = p0[1] - p1[1], u01y = p1[0] - p0[0],
                     u01d = Math.sqrt(u01x * u01x + u01y * u01y);
@@ -251,7 +232,7 @@ function mapMain() {
                     return a;
                 });
             }
-// Compute quads of adjacent points [p0, p1, p2, p3].
+            // Compute quads of adjacent points [p0, p1, p2, p3].
             function quads(points) {
                 return d3.range(points.length - 1).map(function(i) {
                     var a = [points[i - 1], points[i], points[i + 1], points[i + 2]];
@@ -263,12 +244,14 @@ function mapMain() {
                 return d3.interpolate(color1, color2)(d);
             }
 
+            //Begin drawing line
             mapSVG.append('path').attr("id", "migrationPath").style("fill", "none").style("stroke-width", "2")
                 .attr('d', pathData);
 
             var path = mapSVG.select("#migrationPath").remove();
 
             if (path && path.node()) {
+                //draw gradient through a bunch of small lines that are connected
                 mapSVG.selectAll("#migrationPathPortions").data(quads(samples(path.node(), 8)))
 
                     .enter().append("svg:path").attr("id", "migrationPathPortions")
@@ -276,48 +259,11 @@ function mapMain() {
                     .style("stroke", function(d) { return gradientColor(d.t, colors[sourceIndex % colors.length], colors[destinationIndex % colors.length]); })
                     .attr("d", function(d) { return lineJoin(d[0], d[1], d[2], d[3], 2); });
             }
-
-
-        // .style("stroke",colors[destinationIndex % colors.length])
-        //         .style("stroke", function(d) { return gradientColor(d.t, colors[destinationIndex % colors.length]); })
-        //         .style("stroke-width", "2")
-        //         .style("fill", "none");
-
-// Also draw points for reference
-//         d3.select('svg')
-//             .selectAll('circle')
-//             .data(points)
-//             .enter()
-//             .append('circle')
-//             .attr('cx', function(d) {
-//                 return d[0];
-//             })
-//             .attr('cy', function(d) {
-//                 return d[1];
-//             })
-//             .attr('r', 3)
-
-            // mapSVG.append("path").attr("id", "migrationPath").attr("d", function(d) {
-            //     console.log(destinationIndex);
-            //     var target = {x: projection([plantationData[destinationIndex].lon, plantationData[destinationIndex].lat])[0], y: projection([plantationData[destinationIndex].lon, plantationData[destinationIndex].lat])[1]};
-            //     var source = {x: projection([plantationData[sourceIndex].lon, plantationData[sourceIndex].lat])[0], y: projection([plantationData[sourceIndex].lon, plantationData[sourceIndex].lat])[1]};
-            //
-            //     var dx = target.x - source.x,
-            //         dy = target.y - source.y,
-            //         dr = Math.sqrt(dx * dx + dy * dy);
-            //     return "M" + source.x + "," + source.y + "A" + dr + "," + dr +
-            //         " 0 0,1 " + target.x + "," + target.y;
-            // }).attr("class", "migrationPath").attr("stroke", function(d) {
-            //     return colors[destinationIndex % colors.length];
-            // });
-            plantationSelection.each(function (a) {
-                console.log(a);
-                // a.bringElementAsTopLayer();
-            });
+            //bring plntation to front
             plantationSelection.bringElementAsTopLayer();
         }
-        else {
-            if (mapSourcePlantation) {
+        else { //desintation and source not both given
+            if (mapSourcePlantation) { //draw source if has one
                 plantationSelection.attr("class", function(d) {
                     if (d.name !== "GeorgetownUniversity" && d.name === mapSourcePlantation) {
                         return "plantation";
@@ -326,12 +272,10 @@ function mapMain() {
                         return "not_plantation";
                     }
                 });
-                // var mapBox = $('#mapBox');
-                // console.log(mapBox.position());
                 d3.select("#mapOtherLabel").classed("hidden-other-label", false);
                 d3.select('#noMapData').classed("hidden-other-label", true);
             }
-            else {
+            else { //show warning messages for no source or destination
                 d3.select("#mapOtherLabel").classed("hidden-other-label", true);
                 plantationSelection.attr("class", function(d) {
                     return "not_plantation";
@@ -341,13 +285,13 @@ function mapMain() {
         }
     };
 }
-d3.selection.prototype.bringElementAsTopLayer = function() {
+d3.selection.prototype.bringElementAsTopLayer = function() { //make sure something is at front of div
     return this.each(function(){
         this.parentNode.appendChild(this);
     });
 };
 
-mapData.getCoordinatesForPath = function(source, destination) {
+mapData.getCoordinatesForPath = function(source, destination) { //coordinates to draw path through based on source and destination
     if (source === "WhiteMarsh" && destination === "WestOakPlantation") {
         return [[-76.79814,38.98305],
             [-76.42385,38.15042],
