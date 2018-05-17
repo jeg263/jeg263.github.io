@@ -1,32 +1,39 @@
-// var mapData = {mapSVG: null, plantationData: null, plantationSelection: null, projection: null};
-var mapData = {mapSourcePlantation: null, mapDestinationPlantation: null};
-function mapMain() {
-    //calculate initial widths and heights of div
-    var mapSourcePlantation = "";
-    var mapDestinationPlantation = "";
+var width = d3.select("#history")._groups[0][0].clientWidth * 0.5;
+var height = d3.select("#history")._groups[0][0].clientHeight / 4;
+var shuffledPersons;
+// var width = height = 500;
 
-    var mapSVG;
-    var plantationData;
-    var plantationSelection = null;
+// D3 Projection
+var projection = d3.geoAlbersUsa()
+    .translate([-50, height/3.5])    // translate to center of screen
+    .scale([2000]);          // scale things down so see entire US
 
-    var width = d3.select("#history")._groups[0][0].clientWidth * 0.50;
-    var height = d3.select("#history")._groups[0][0].clientHeight / 3;
+// Define path generator
+var path = d3.geoPath()         // path generator that will convert GeoJSON to SVG paths
+    .projection(projection);
 
-    // D3 Projection
-    var projection = d3.geoAlbersUsa()
-        .translate([width * .05, height/3.5])    // translate to center of screen
-        .scale([1800]);          // scale things down so see entire US
-    mapData.projection = projection;
+$(document).ready(function() {
 
-    // Define path generator
-    var path = d3.geoPath()         // path generator that will convert GeoJSON to SVG paths
-        .projection(projection);  // tell path generator to use albersUsa projection
 
-    // Load GeoJSON data and merge with states data
-    d3.json("data/us-se-map.json", function(mapData) {
+// Load GeoJSON data and merge with states data
+    d3.json("./data/us-se-map.json", function(mapData) {
+        // tell path generator to use albersUsa projection
+        height = d3.select("#history")._groups[0][0].clientHeight / 4;
+// var width = height = 500;
+
+// D3 Projection
+        projection = d3.geoAlbersUsa()
+            .translate([-50, height/3.5])    // translate to center of screen
+            .scale([2000]);          // scale things down so see entire US
+
+// Define path generator
+        path = d3.geoPath()         // path generator that will convert GeoJSON to SVG paths
+            .projection(projection);
+
         //Width and height of map
-        var width = d3.select("#history")._groups[0][0].clientWidth;
-        var height = d3.select("#history")._groups[0][0].clientHeight;
+        var width = d3.select("#history")._groups[0][0].clientWidth * 0.5;
+        var height = d3.select("#history")._groups[0][0].clientHeight / 4;
+        console.log(width, height);
 
         // Bind the data to the SVG and create one path per GeoJSON feature
         var svg = d3.select("#map")
@@ -43,415 +50,178 @@ function mapMain() {
             .attr("id", function(d) {
                 return d.properties.name.replace(/\s/g, '').toLowerCase()
             })
-            .attr("class", "state")
-            .style("stroke", "#fff")
+            .attr("class", function(d) {
+                if (d.properties.class == "Route") {
+                    return "route"
+                }
+                return "state"
+            })
+            .style("stroke", function(d) {
+                if (d.properties.class != "Route") {
+                    return "#fff"
+                }
+                return "none"
+            })
             .style("stroke-width", "1")
-            .style("fill", "#b6babd");
+            .style("fill", function(d) {
+                if (d.properties.class != "Route") {
+                    return "#e1e1e1"
+                }
+                return "none"
+            });
+
+
     });
 
-    d3.json("data/plantation-location.json", function(data) { //load map data
-        plantationData = data;
-        plantationData = plantationData.map(function(d) { d.originalName = d.name; d.name = cleanName(d.name); return d}); //get plantation names
-        mapSVG = d3.select(".map");
+    d3.json("./data/plantation-location.json", function(plantationData) {
+        d3.json("./data/person-location.json", function(personData){
+            console.log(plantationData)
 
-        plantationSelection = d3.select(".map") //hide anything that is not a plantation (i.e. Georgetown)
-            .selectAll('g')
-            .data(plantationData)
-            .enter()
-            .append("g")
-            .attr("class", function(d) {
-                return "not_plantation";
-            })
-            // .attr("display", "none")
-            .attr("id", function(d) {
-                return d.name.replace(/[\s\.\']/g, '').toLowerCase()
-            });
+            // var colors = {"#41b6c4","#2c7fb8","#253494","#7fcdbb","#ffffcc","#c7e9b4"];
+            var colors = {"Georgetown University": "#41b6c4", "White Marsh": "#2c7fb8", "St. Thomas's Manor": "#253494", "Newtown": "#7fcdbb", "St. Inigoes": "#ffffcc","West Oak Plantation": "#c7e9b4", "Chatham Plantation": "red"}
+            var svg = d3.select(".map")
 
-        var x = -20,
-            y = -20;
+            var locations = svg.selectAll('g')
+                .data(plantationData)
+                .enter()
+                .append("g")
 
-        var colors = ["#FF8000","#0077C5","#FFDC12","#008380","#D52B1E","#53B447"]; //colors for plantations
+            locations.append("circle")
+                .attr("id", function(d) {
+                    return d.name_id })
+                .attr("class", "location")
+                .attr("cx", function(d) {return projection([d.lon, d.lat])[0]})
+                .attr("cy", function(d) {return projection([d.lon, d.lat])[1];})
+                .attr("r", 5)
+                .attr("stroke", function(d, i) {
+                    return "white";})
+                .attr("fill", function(d, i) {
+                    return colors[d.name];})
 
-        plantationSelection //create plantations
-            .append("text")
-            .text(function(d) {
-                return d.originalName;
-            })
-            .attr("class", "location")
-            .attr("text-anchor", "middle")
-            .attr("x", function(d, i) {
-                if (i % 2 == 0) {
-                    return projection([d.lon, d.lat])[0] + 50;
-                }
-                return projection([d.lon, d.lat])[0] - 50;
-            })
-            .attr("y", function(d, i) {
-                if (i <= 2) {
-                    return projection([d.lon, d.lat])[1] - 30;
-                }
-                return projection([d.lon, d.lat])[1] + 30;
-            })
+            var person = svg.selectAll('g')
+                .data(personData)
+                .enter()
+                .append("g")
 
-        var imgWidth = 20,
-            imgHeight = 24;
-        plantationSelection
-            .append("circle")
-            .attr("class", "location plantation-center")
-            .attr("cx", function(d) {
-                return projection([d.lon, d.lat])[0]
-            })
-            .attr("cy", function(d) {
-                return projection([d.lon, d.lat])[1];
-            })
-            .attr("r", 5)
-            .attr("stroke", function(d, i) {
-                return "white";})
-            .attr("fill", function(d, i) {
-                return colors[i % colors.length];
-            })
-            .append("svg:image")
-            .attr("class", function(d) {
-                if (d.name !== "GeorgetownUniversity") {
-                    return "plantation";
-                }
-            })
-            .attr("x", function(d) {
-                return projection([d.lon, d.lat])[0] - imgWidth / 2.3;
-            })
-            .attr("y", function(d) {
-                return projection([d.lon, d.lat])[1] - imgHeight;
-            })
-            .attr('width', imgWidth)
-            .attr('height', imgHeight)
-            .attr("xlink:href", "images/pin.svg");
+            person.append("circle")
+                .attr("id", function(d)
+                {
+                    return d.pid})
+                .attr("class", "person")
+                .attr("cx", function(d) {
+                    return projection([d.longitude, d.lat])[0]
+                })
+                .attr("cy", function(d) {
+                    return projection([d.longitude, d.lat])[1];
+                })
+                .attr("r", 4)
+                // .attr("stroke", function(d, i) {
+                // 	return "white";
+                // })
+                .attr("fill", function(d, i) {
+                    return colors[d.name];
+                })
 
-        mapData.mapSVG = mapSVG;
-        mapData.plantationData = plantationData;
-        mapData.plantationSelection = plantationSelection;
+            var legend = svg.append("g")
+                .attr("class", "map-legend")
+                .attr("width", "50px")
+                .attr("height", "20px")
+                .attr("transform", function(d) {
+                    var map = d3.select('.map').node();
+                    var mapHeight = map.getBoundingClientRect().height
+                    return "translate("+ width * 0.425 + ", "+ mapHeight * 0.55 +")"
+                });
+
+            legend.selectAll("text")
+                .data(plantationData)
+                .enter()
+                .append("text")
+                .attr("class", "map-legend")
+                .text(function(d) { return d.name; })
+                .attr("transform", function(d,i) {
+                    return "translate(0,"+ i * 20 + ")"
+                })
+
+            legend.selectAll("rect")
+                .data(plantationData)
+                .enter()
+                .append("rect")
+                .attr("class", "map-legend")
+                .attr("width", "10px")
+                .attr("height", "10px")
+                .attr("fill", function(d, i) {
+                    return colors[d.name];
+                })
+                .attr("transform", function(d,i) {
+                    y = i * 20 - 9
+                    return "translate(-15,"+ y + ")"
+                });
+        });
     });
-    mapData.updateMap = function() {
-        var colors = ["#FF8000","#0077C5","#FFDC12","#008380","#D52B1E","#53B447"]; //colors for map
-        mapSourcePlantation = mapData.mapSourcePlantation;
-        mapDestinationPlantation = mapData.mapDestinationPlantation;
+});
+var colors = {"Georgetown University": "#41b6c4", "White Marsh": "#2c7fb8", "St. Thomas's Manor": "#253494", "Newtown": "#7fcdbb", "St. Inigoes": "#ffffcc","West Oak Plantation": "#c7e9b4", "Chatham Plantation": "red"}
 
-        mapSVG.selectAll("#migrationPath").remove(); //remove old path between source and destination
-        mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
-
-        if (mapDestinationPlantation !== "") {
-            d3.select("#mapOtherLabel").classed("hidden-other-label", true); //hide warning messages
-            d3.select('#noMapData').classed("hidden-other-label", true);
-
-            var destination = plantationData.find(function (d) {
-                if (mapDestinationPlantation === "HenryJohnson") { //Adjust names from buyers to plantation names
-                    mapDestinationPlantation = "ChathamPlantation";
-                }
-                else if (mapDestinationPlantation === "JesseBatey") {
-                    mapDestinationPlantation = "WestOakPlantation";
-                }
-                if (d.name === mapDestinationPlantation) {
-                    return d;
-                }
-            });
-            var source = plantationData.find(function (d) { //find plantation with correct name
-                if (d.name === mapSourcePlantation) {
-                    return d;
-                }
-            });
-            var destinationIndex = plantationData.indexOf(destination);
-            var sourceIndex = plantationData.indexOf(source);
-
-            plantationSelection.attr("class", function(d) {
-                if (d.name !== "GeorgetownUniversity" && d.name === mapDestinationPlantation || d.name === mapSourcePlantation) { //exclude Georgetown
-                    return "plantation";
-                }
-                else {
-                    return "not_plantation";
-                }
-            });
-
-
-            var lineGenerator = d3.line() //start line drawing between two points
-                .curve(d3.curveCardinal);
-
-            var points = mapData.getCoordinatesForPath(mapSourcePlantation, mapDestinationPlantation); //get coordinates to draw points thorugh
-
-            points = points.map(function (p) {
-                return projection(p)
-            });
-
-
-            //
-            // Draw Gradient line
-            //
-
-            var pathData = lineGenerator(points);
-
-            //Gradient line functions
-            // Compute stroke outline for segment p12.
-            function lineJoin(p0, p1, p2, p3, width) {
-                var u12 = perp(p1, p2),
-                    r = width / 2,
-                    a = [p1[0] + u12[0] * r, p1[1] + u12[1] * r],
-                    b = [p2[0] + u12[0] * r, p2[1] + u12[1] * r],
-                    c = [p2[0] - u12[0] * r, p2[1] - u12[1] * r],
-                    d = [p1[0] - u12[0] * r, p1[1] - u12[1] * r];
-                if (p0) { // clip ad and dc using average of u01 and u12
-                    var u01 = perp(p0, p1), e = [p1[0] + u01[0] + u12[0], p1[1] + u01[1] + u12[1]];
-                    a = lineIntersect(p1, e, a, b);
-                    d = lineIntersect(p1, e, d, c);
-                }
-                if (p3) { // clip ab and dc using average of u12 and u23
-                    var u23 = perp(p2, p3), e = [p2[0] + u23[0] + u12[0], p2[1] + u23[1] + u12[1]];
-                    b = lineIntersect(p2, e, a, b);
-                    c = lineIntersect(p2, e, d, c);
-                }
-                return "M" + a + "L" + b + " " + c + " " + d + "Z";
-            }
-            // Compute intersection of two infinite lines ab and cd.
-            function lineIntersect(a, b, c, d) {
-                var x1 = c[0], x3 = a[0], x21 = d[0] - x1, x43 = b[0] - x3,
-                    y1 = c[1], y3 = a[1], y21 = d[1] - y1, y43 = b[1] - y3,
-                    ua = (x43 * (y1 - y3) - y43 * (x1 - x3)) / (y43 * x21 - x43 * y21);
-                return [x1 + ua * x21, y1 + ua * y21];
-            }
-            // Compute unit vector perpendicular to p01.
-            function perp(p0, p1) {
-                var u01x = p0[1] - p1[1], u01y = p1[0] - p0[0],
-                    u01d = Math.sqrt(u01x * u01x + u01y * u01y);
-                return [u01x / u01d, u01y / u01d];
-            }
-            // Sample the SVG path uniformly with the specified precision.
-            function samples(path, precision) {
-                console.log(path);
-                var n = path.getTotalLength(), t = [0], i = 0, dt = precision;
-                while ((i += dt) < n) t.push(i);
-                t.push(n);
-                return t.map(function(t) {
-                    var p = path.getPointAtLength(t), a = [p.x, p.y];
-                    a.t = t / n;
-                    return a;
-                });
-            }
-            // Compute quads of adjacent points [p0, p1, p2, p3].
-            function quads(points) {
-                return d3.range(points.length - 1).map(function(i) {
-                    var a = [points[i - 1], points[i], points[i + 1], points[i + 2]];
-                    a.t = (points[i].t + points[i + 1].t) / 2;
-                    return a;
-                });
-            }
-            function gradientColor(d, color1, color2) {
-                return d3.interpolate(color1, color2)(d);
-            }
-
-            //Begin drawing line
-            mapSVG.append('path').attr("id", "migrationPath").style("fill", "none").style("stroke-width", "2")
-                .attr('d', pathData);
-
-            var path = mapSVG.select("#migrationPath").remove();
-
-            if (path && path.node()) {
-                //draw gradient through a bunch of small lines that are connected
-                mapSVG.selectAll("#migrationPathPortions").data(quads(samples(path.node(), 8)))
-
-                    .enter().append("svg:path").attr("id", "migrationPathPortions")
-                    .style("fill", function(d) { return gradientColor(d.t, colors[sourceIndex % colors.length], colors[destinationIndex % colors.length]); })
-                    .style("stroke", function(d) { return gradientColor(d.t, colors[sourceIndex % colors.length], colors[destinationIndex % colors.length]); })
-                    .attr("d", function(d) { return lineJoin(d[0], d[1], d[2], d[3], 2); });
-            }
-            //bring plntation to front
-            plantationSelection.bringElementAsTopLayer();
-        }
-        else { //desintation and source not both given
-            if (mapSourcePlantation) { //draw source if has one
-                plantationSelection.attr("class", function(d) {
-                    if (d.name !== "GeorgetownUniversity" && d.name === mapSourcePlantation) {
-                        return "plantation";
-                    }
-                    else {
-                        return "not_plantation";
-                    }
-                });
-                d3.select("#mapOtherLabel").classed("hidden-other-label", false);
-                d3.select('#noMapData').classed("hidden-other-label", true);
-            }
-            else { //show warning messages for no source or destination
-                d3.select("#mapOtherLabel").classed("hidden-other-label", true);
-                plantationSelection.attr("class", function(d) {
-                    return "not_plantation";
-                });
-                d3.select('#noMapData').classed("hidden-other-label", false);
-            }
-        }
-    };
+function shuffleElements(array) {
+    for (var i=0; i < array.length; i++) {
+        var randomIndex = Math.floor(Math.random() * array.length)
+        var temp = array[i]
+        array[i] = array[randomIndex]
+        array[randomIndex] = temp
+    }
+    return array
 }
-d3.selection.prototype.bringElementAsTopLayer = function() { //make sure something is at front of div
-    return this.each(function(){
-        this.parentNode.appendChild(this);
-    });
-};
 
-mapData.getCoordinatesForPath = function(source, destination) { //coordinates to draw path through based on source and destination
-    if (source === "WhiteMarsh" && destination === "WestOakPlantation") {
-        return [[-76.79814,38.98305],
-            [-76.42385,38.15042],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.51955, 30.4913]]
+function transition(point, route) {
+    // console.log(point)
+    // console.log(route)
+    // setTimeout(function() {
+    var l = route.node().getTotalLength();
+    point.transition()
+        .duration(2000)
+        .attrTween("transform", delta(point, route.node()))
+        .attr("fill", function(d) {
+            if (d.dest == "chathamplantation") {
+                return colors["Chatham Plantation"]
+            }
+            return colors["West Oak Plantation"]
+        });
+    // transition(point, route)
+    // }, 50);
+}
+
+function delta(point, path) {
+    var l = path.getTotalLength();
+    return function(i) {
+        return function(t) {
+            var p = path.getPointAtLength(t * l);
+            var x = p.x - parseFloat(point.attr("cx"))
+            var y = p.y  - parseFloat(point.attr("cy"))
+            return "translate(" + x + "," + y + ")";
+        }
     }
-    if (source === "WhiteMarsh" && destination === "ChathamPlantation") {
-        return [[-76.79814,38.98305],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.05949, 30.18697]]
-    }
-    if (source === "StThomassManor" && destination === "WestOakPlantation") {
-        return [[-77.0237,38.46552],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.51955, 30.4913]]
-    }
-    if (source === "StThomassManor" && destination === "ChathamPlantation") {
-        return     [[-77.0237,38.46552],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.05949, 30.18697]]
-    }
-    if (source === "Newtown" && destination === "WestOakPlantation") {
-        return [[-76.69998,38.25569],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.51955, 30.4913]]
-    }
-    if (source === "Newtown" && destination === "ChathamPlantation") {
-        return [[-76.69998,38.25569],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.05949, 30.18697]]
-    }
-    if (source === "StInigoes" && destination === "WestOakPlantation") {
-        return [[-76.42385,38.15042],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.51955, 30.4913]]
-    }
-    if (source === "StInigoes" && destination === "ChathamPlantation") {
-        return [[-76.42385,38.15042],
-            [-76.11328, 37.68382],
-            [-75.94848, 37.0464],
-            [-75.66284, 36.52729],
-            [-74.68505, 35.31736],
-            [-75.56396, 34.16181],
-            [-77.14599, 33.21111],
-            [-78.88183, 31.69078],
-            [-79.67285, 30.37287],
-            [-79.10156, 27.95559],
-            [-79.23339, 25.40358],
-            [-81.0791, 24.28702],
-            [-83.18847, 26.11598],
-            [-84.59472, 28.61345],
-            [-87.62695, 29.45873],
-            [-90.08789, 28.38173],
-            [-91.58203, 29.19053],
-            [-91.05949, 30.18697]]
-    }
-};
-mapMain();
+}
+
+function myLoop(i){
+    setTimeout(function() {
+        $(shuffledPersons[i]).css("color", function() {return colors[$(shuffledPersons[i])[0].__data__.name]})
+        var plantation = $(shuffledPersons[i])[0].__data__.name_id
+        var dest = $(shuffledPersons[i])[0].__data__.dest
+        var id = $(shuffledPersons[i])[0].__data__.pid
+        if (dest != "") {
+            var route = plantation + "2" + dest
+            console.log(route)
+            transition(d3.select("#" + id), d3.select("#" + route))
+        }
+        i++;
+        myLoop(i)
+    }, 100);
+}
+
+function animateMap() {
+    var persons = $(".person")
+    shuffledPersons = shuffleElements(persons)
+    var i = 0
+    myLoop(i)
+
+}
+

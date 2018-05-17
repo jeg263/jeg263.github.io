@@ -60,8 +60,10 @@ function controllerMain() {
             showSidebar = !showSidebar;
             d3v2.select("#left-container").classed("stage-shrink", showSidebar);
             d3v2.select("#right-container").classed("stage-open", showSidebar);
+            d3v2.select("#right-positioning-container").classed("stage-open", showSidebar);
             d3v2.select("#left-container").classed("stage-grow", !showSidebar);
             d3v2.select("#right-container").classed("stage-close", !showSidebar);
+            d3v2.select("#right-positioning-container").classed("stage-close", !showSidebar);
 
             d3v2.select("#rightButton").classed("open-button", showSidebar);
             d3v2.select("#leftButton").classed("open-button", !showSidebar);
