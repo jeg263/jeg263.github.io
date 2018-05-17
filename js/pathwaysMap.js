@@ -9,8 +9,8 @@ function mapMain() {
     var plantationData;
     var plantationSelection = null;
 
-    var width = d3.select("#history")._groups[0][0].clientWidth * 0.50;
-    var height = d3.select("#history")._groups[0][0].clientHeight / 3;
+    var width = d3.select("#pathwaysHistory")._groups[0][0].clientWidth * 0.50;
+    var height = d3.select("#pathwaysHistory")._groups[0][0].clientHeight / 3;
 
     // D3 Projection
     var projection = d3.geoAlbersUsa()
@@ -25,8 +25,8 @@ function mapMain() {
     // Load GeoJSON data and merge with states data
     d3.json("data/us-se-map.json", function(mapData) {
         //Width and height of map
-        var width = d3.select("#history")._groups[0][0].clientWidth;
-        var height = d3.select("#history")._groups[0][0].clientHeight;
+        var width = d3.select("#pathwaysHistory")._groups[0][0].clientWidth;
+        var height = d3.select("#pathwaysHistory")._groups[0][0].clientHeight;
 
         // Bind the data to the SVG and create one path per GeoJSON feature
         var svg = d3.select("#pathwaysMap")
@@ -43,7 +43,12 @@ function mapMain() {
             .attr("id", function(d) {
                 return d.properties.name.replace(/\s/g, '').toLowerCase()
             })
-            .attr("class", "state")
+            .attr("class", function(d) {
+                if (d.properties.class == "Route") {
+                    return "route"
+                }
+                return "state"
+            })
             .style("stroke", "#fff")
             .style("stroke-width", "1")
             .style("fill", "#b6babd");
