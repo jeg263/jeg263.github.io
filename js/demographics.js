@@ -1,5 +1,5 @@
 // https://codepen.io/zakariachowdhury/pen/OWdyjq
-var data = d3.csv("data/gu272.csv", function(data) {
+var data = d3.csv("./data/gu272.csv", function(data) {
 	// console.log(data)
 	var maleCount = 0,
 			femaleCount = 0,
