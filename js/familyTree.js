@@ -1,56 +1,51 @@
-
-var margin = {top: 70, right: 0, bottom: 150, left: 100},
-    width = 1250 - margin.left - margin.right,
-    height = 650 - margin.top - margin.bottom;
-
-//Append svg and g elements to body
-var svg = d3.select("#family-tree").append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 var div = d3.select("body").append("div")
+    .attr("id","tree-tooltip")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-var i = 0,							//node id increment factor
-    duration = 700;			//duration of transition
+var i = 0,                          //node id increment factor
+    duration = 700;                 //duration of transition
 
 //Load data
 var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
     if (error) return console.error(error);
-    // console.log(json);
 
     //Bind json objects to g elements
-    var trees = svg.selectAll("g.tree")
+    var svg = d3.selectAll(".treeContainer")
         .data(json)
-        .enter()
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("id", function(d) {return "svg" + d.id})
         .append("g")
-        .attr("class", "tree")
-        //Tree id used in update() to bind data to correct g element
+        // Tree id used in update() to bind data to correct g element
         .attr("id", function(d) { return "t" + d.id; })
+        .attr("class", "tree")
+        // Transform along x axis based on name length
         .attr("transform", function(d) {
-            var x,y;
-            if (i <= 3) y = 0;
-            else if (i > 3 && i < 8) y = 200;
-            else y = 400;
-            return "translate(" + (((i++ % 4) * 325))+ "," + y + ")"
+            var x = 10 + (d.first_name.length * 12);
+            if (d.first_name == "Ned" || d.first_name == "Anny") {
+                x += 7
+            }
+            return "translate(" + x + ", 0)";
         });
 
     //Call chart function for every JSON objecct
-    trees.call(chart);
+    var trees = d3.selectAll(".tree");
+        trees.call(chart);
 
     //Generate tree
     function chart(selection) {
         selection.each(function(data) {
-            var root = d3.hierarchy(data);
 
-            root.x0 = height/2;
+            var root = d3.hierarchy(data);
+            var height = $("#svg" + data.id).height();
+            var width = $("#svg" + data.id).width(); 
+
+            root.x0 = height;
             root.y0 = 0;
 
-            var tree = d3.tree().size([height/3, width/2.5]);
-
+            var tree = d3.tree().size([height, width]);
             update(root);
 
             function update(source) {
@@ -62,11 +57,11 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
 
                 //Normalize for fixed depth
                 nodes.forEach(function(d){
-                    d.y = d.depth * 110;
+                    d.y = d.depth * 100;
                 });
 
                 // Declare node element and id
-                var node = g.selectAll("g.node")
+                var node = g.selectAll("g.person-node")
                     .data(nodes, function(d) {
                         return d.id || (d.id = ++i)})
                     .attr("id", function(d) {
@@ -75,7 +70,7 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
 
                 //Enter new nodes at parent"s previous position
                 var nodeEnter = node.enter().append("g")
-                    .attr("class", "node")
+                    .attr("class", "person-node")
                     .attr("transform", function(d) {
                         return "translate(" + source.y0 + "," + source.x0 + ")";
                     })
@@ -86,11 +81,8 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
 
                 //Add circles for the nodes
                 nodeEnter.append("circle")
-                    .attr("class", "node")
-                    .attr("r", .5)
-                    .style("fill", function(d) {
-                        return d._children ? "lightsteelblue" : "#fff";
-                    });
+                    .attr("class", "person-node")
+                    .attr("r", .5);
 
                 // Add labels for the nodes
                 nodeEnter.append("text")
@@ -102,6 +94,12 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
                         return d.children || d._children ? "end" : "start";
                     })
                     .text(function(d) { return d.data.first_name;})
+                    .style("font-size", function(d) { if (d.data.first_name == "Anderson") {
+                        return "calc(7px + 0.45vh)"
+                    }})
+                    .style("letter-spacing", function(d) { if (d.data.first_name == "Anderson") {
+                        return "-0.3"
+                    }})
                     .on("mouseover", function(d) { mouseover(d, g) })
                     .on("mouseout", mouseout);
 
@@ -115,11 +113,8 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
                     });
 
                 // Update the node attributes and style
-                nodeUpdate.select("circle.node")
-                    .attr("r", 7)
-                    .style("fill", function(d) {
-                        return d._children ? "lightsteelblue" : "#fff";
-                    })
+                nodeUpdate.select("circle.person-node")
+                    .attr("r", 8)
                     .attr("cursor", "pointer")
                     .on('mouseover', function(d) { mouseover(d, g) })
                     .on('mouseout', mouseout);
@@ -143,12 +138,12 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
                 var links = treeData.descendants().slice(1);
 
                 // Update the links
-                var link = g.selectAll('path.link')
+                var link = g.selectAll('path.family-link')
                     .data(links, function(d) { return d.id; });
 
                 // Enter any new links at the parent's previous position
                 var linkEnter = link.enter().insert('path', "g")
-                    .attr("class", "link")
+                    .attr("class", "family-link")
                     .attr('d', function(d){
                         var o = {x: source.x0, y: source.y0}
                         // console.log(diagonal(o, o));
@@ -181,9 +176,9 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
                 // Creates a curved path from parent to the child nodes
                 function diagonal(s, d) {
                     path = `M ${s.y} ${s.x}
-		            C ${(s.y + d.y) / 2} ${s.x},
-		              ${(s.y + d.y) / 2} ${d.x},
-		              ${d.y} ${d.x}`
+                    C ${(s.y + d.y) / 2} ${s.x},
+                      ${(s.y + d.y) / 2} ${d.x},
+                      ${d.y} ${d.x}`
                     return path
                 }
 
@@ -200,7 +195,7 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
                 }
 
                 function mouseover(d, g) {
-                    var tooltip = d3.select('.tooltip');
+                    var tooltip = d3.select('#tree-tooltip');
 
                     tooltip.transition()
                         .duration(300)
@@ -209,10 +204,6 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
                         .html('<b>' + (d.data.full_name) + '</b><br>' +
                             'Birthdate: ' + (d.data.birthdate) + '<br>' +
                             'Age: ' + (d.data.age) + '<br>')
-                    // tooltip.style('display', 'inline-block')
-                    // 	.html((d.data.full_name) + '<br>' +
-                    // 		'Birthdate: ' + (d.data.birthdate) + '<br>' +
-                    // 		'Age: ' + (d.data.age) + '<br>')
                     tooltip.style('width', function() {
                         var maxLength = Math.max(Math.max(4 + d.data.age.length,
                             11 + d.data.birthdate.length), d.data.full_name.length);
@@ -223,7 +214,7 @@ var data = d3.json("./data/filtered-gu272-data.json", function(error, json) {
                 }
 
                 function mouseout() {
-                    var tooltip = d3.select('.tooltip')
+                    var tooltip = d3.select('#tree-tooltip')
                     tooltip.transition()
                         .duration(500)
                         .style("opacity", 0);

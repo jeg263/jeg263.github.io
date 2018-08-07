@@ -5,7 +5,7 @@ d3.csv("./data/gu272.csv", function(data) {
 		for (var i = 0; i < data.length; i++) {
 			if (data[i].gender == "male") {
 				maleCount++;
-				if (data[i].age >= 18) {
+				if (data[i].age >= 21) {
 					adultMale++; 
 				} else {
 					childMale++;
@@ -13,7 +13,7 @@ d3.csv("./data/gu272.csv", function(data) {
 			}
 			else if (data[i].gender == "female") {
 				femaleCount++;
-				if (data[i].age >= 18) {
+				if (data[i].age >= 21) {
 					adultFemale++; 
 				} else {
 					childFemale++;
@@ -23,15 +23,14 @@ d3.csv("./data/gu272.csv", function(data) {
 		var totalCount = adultFemale + adultMale + childMale + childFemale;
 		genderData = [{"gender": "Male", "count": maleCount, "percent": Math.round(maleCount/totalCount*100)}, 
 			{"gender": "Female", "count": femaleCount-1, "percent": Math.round(femaleCount/totalCount*100)}];
-		familyData = [{"member": "Men", "count": adultMale,"percent":Math.round(adultMale/totalCount*100)}, 
-			{"member": "Women", "count": adultFemale,"percent": Math.round(adultFemale/totalCount*100)},
-			{"member": "Boys", "count": childMale,"percent":Math.round(childMale/totalCount*100)},
-			{"member": "Girls", "count": childFemale,"percent":Math.round(childFemale/totalCount*100)}];
+		familyData = [{"member": "Men", "percent":adultMale/totalCount}, 
+			{"member": "Women", "percent": adultFemale/totalCount},
+			{"member": "Boys", "percent":childMale/totalCount},
+			{"member": "Girls", "percent":childFemale/totalCount}];
 
 		var width = $(".graphContainer").width();
 		var height = width;	
 		var titleSize = "calc(8px + 0.9vh)";
-		var subtitleSize = "calc(8px + 0.7vh)";
 		var axisTickSize = "calc(8px + 0.5vh)";	
 		var opacity = 0.8;
 
@@ -61,7 +60,6 @@ d3.csv("./data/gu272.csv", function(data) {
 			.attr("transform", "translate(" + (width/2) + "," + (height/2) + ")");
 		var tooltip = d3.select("#pie")
 				.append("div")
-				.attr("id", "demo-tooltip")
 				.attr("class", "tooltip");
 			tooltip.append("div")
 				.attr("class", "gender");
@@ -75,7 +73,7 @@ d3.csv("./data/gu272.csv", function(data) {
 		      .attr("class", "arc");
 		 	var path = g.append("path")
 		 		.attr("d", arc)
-		 		.style("fill", function(d, i) { return pieColor(i);})
+		 		.style("fill", (d,i) => pieColor(i))
 		 		.style("opacity", opacity)
 		  	.style("stroke", "white")
 		  	.style("stroke-width", "5px")
@@ -111,12 +109,12 @@ d3.csv("./data/gu272.csv", function(data) {
 			legend.append("rect")
 				.attr("width", legendRectSize)
 				.attr("height", legendRectSize)
-				.style("fill", function(d, i) { return pieColor(i);})
-				.style("stroke", function(d, i) { return pieColor(i);})
+				.style("fill", (d,i) => pieColor(i))
+				.style("stroke", (d,i) => pieColor(i))
 			legend.append("text")
 				.attr("x", legendRectSize + legendSpacing)
 				.attr("y", legendRectSize - legendSpacing)
-				.text(function(d) {return `${d.gender} - ${d.percent}%`})
+				.text(d => `${d.gender} - ${d.percent}%`)
 				.style("font-size", titleSize);
 
 		// Bar Chart
@@ -136,16 +134,6 @@ d3.csv("./data/gu272.csv", function(data) {
 			.append("text")
 			.text("Age")
 			.attr("class", "chart-title");
-
-		var barTooltip = d3.select("#bar")
-				.append("div")
-				.attr("class", "tooltip");
-			barTooltip.append("div")
-				.attr("class", "label");
-			barTooltip.append("div")
-				.attr("class", "count");
-			barTooltip.append("div")
-				.attr("class", "percent");
 			
 		svg = d3.select("#bar")
 			.append("svg")
@@ -155,7 +143,7 @@ d3.csv("./data/gu272.csv", function(data) {
 		  .append("g")
 		  .attr("transform", "translate(" + barMargin.left + "," + barMargin.top + ")");
 
-		var bar = svg.selectAll(".bar")
+		svg.selectAll(".bar")
 			.data(familyData)
 		  .enter().append("rect")
 		  .attr("class", "bar")
@@ -163,50 +151,18 @@ d3.csv("./data/gu272.csv", function(data) {
 		  .attr("width", x.bandwidth())
 		  .attr("y", function(d) { return y(d.percent); })
 		  .attr("height", function(d) { return barHeight - y(d.percent); })
-		  .style("fill", function(d, i) { return barColor(i);})
-		  .style("opacity", opacity)
-		  .style("cursor", "pointer");
-
-		bar.on("mouseover", function(d) {
-			barTooltip.select(".label").html(d.member).style("font-weight", "bold");
-			barTooltip.select(".count").html(d.count + " people");
-			barTooltip.select(".percent").html(d.percent + "%");
-			barTooltip.style("display", "block")
-			barTooltip.style("opacity", 1);});
-
-		bar.on("mousemove", function(d) {
-			barTooltip.style("top", (d3.event.layerY + 10) + "px")
-			.style("left", (d3.event.layerX - 25) + "px");});
-
-		bar.on("mouseout", function() {
-			barTooltip.style("display", "none");
-			barTooltip.style("opacity", 0);});
+		  .attr("fill", (d,i) => barColor(i))
+		  .style("opacity", opacity);
 
 		svg.append("g")
 		  .attr("transform", "translate(0," + barHeight + ")")
 		  .call(d3.axisBottom(x))
 		  .style("font-size", titleSize);
-
-		svg.append("text")
-			.attr("transform", "translate(" + barWidth * 0.125 + "," + (barHeight + barMargin.bottom * 0.65) + ")")
-			.attr("font-size", subtitleSize)
-			.style("opacity", 0.7)
-			.style("font-style", "italic")
-			.text("18 and older");
-
-		svg.append("text")
-		.attr("transform", "translate(" + barWidth * 0.625 + "," + (barHeight + barMargin.bottom * 0.65) + ")")
-		.attr("font-size", subtitleSize)
-		.style("opacity", 0.7)
-		.style("font-style", "italic")
-		.text("Under 18");
-
 		svg.append("g")
 		  .call(d3.axisLeft(y)
-		    .ticks(15)
-		    .tickFormat(function(d) { return d + "%"; }))
+		    .ticks(20)
+		    .tickFormat(function(d) { return Math.round(d * 100)+ "%"; }))
 		  .style("font-size", axisTickSize);
-
     svg.append("text")
     	.attr("transform", "rotate(-90)")
     	.attr("x", 0 - barHeight/2)

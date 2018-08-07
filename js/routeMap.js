@@ -1,46 +1,45 @@
-var width = d3.select("#history")._groups[0][0].clientWidth * 0.5;
-var height = d3.select("#history")._groups[0][0].clientHeight / 4;
-var shuffledPersons;
-// var width = height = 500;
+var width = $("#routeMapContainer").width();
+var height = $("#routeMapContainer").height();
 
-// D3 Projection
 var projection = d3.geoAlbersUsa()
-    .translate([-50, height/3.5])    // translate to center of screen
-    .scale([2000]);          // scale things down so see entire US
+.translate([-22, height/3.5])    // translate to center of screen
+.scale([1.85 * width + 0.9 * height]);          // scale things down so see entire US          
 
 // Define path generator
-var path = d3.geoPath()         // path generator that will convert GeoJSON to SVG paths
+var path = d3.geoPath()         
     .projection(projection);
 
 $(document).ready(function() {
-
-
-// Load GeoJSON data and merge with states data
+    // scaleMap()
+    // Load GeoJSON data and merge with states data
     d3.json("./data/us-se-map.json", function(mapData) {
-        // tell path generator to use albersUsa projection
-        height = d3.select("#history")._groups[0][0].clientHeight / 4;
-// var width = height = 500;
+        var shuffledPersons;
 
-// D3 Projection
+        width = $("#routeMapContainer").width();
+        height = $("#routeMapContainer").height();
+
+
         projection = d3.geoAlbersUsa()
-            .translate([-50, height/3.5])    // translate to center of screen
-            .scale([2000]);          // scale things down so see entire US
+            .translate([-22, height/3.5])    // translate to center of screen
+            .scale([1.95 * width + 0.95 * height]);          // scale things down so see entire US  
+            // .scale([950])    
 
-// Define path generator
-        path = d3.geoPath()         // path generator that will convert GeoJSON to SVG paths
+            // 460x + 406y = 1200 
+            // 720x + 697y = 2000
+            // 665x + 629y = 1800
+            // 540x + 279y = 950
+            // width*x + height*y = scale. used to empirically find weights
+
+        // Define path generator
+        path = d3.geoPath()         
             .projection(projection);
 
-        //Width and height of map
-        var width = d3.select("#history")._groups[0][0].clientWidth * 0.5;
-        var height = d3.select("#history")._groups[0][0].clientHeight / 4;
-        console.log(width, height);
-
         // Bind the data to the SVG and create one path per GeoJSON feature
-        var svg = d3.select("#map")
+        var svg = d3.select("#routeMapContainer")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
-            .attr("class", "map");
+            .attr("id", "routeMap");
 
         svg.selectAll("path")
             .data(mapData.features)
@@ -70,16 +69,15 @@ $(document).ready(function() {
                 return "none"
             });
 
-
     });
 
     d3.json("./data/plantation-location.json", function(plantationData) {
         d3.json("./data/person-location.json", function(personData){
-            console.log(plantationData)
 
-            // var colors = {"#41b6c4","#2c7fb8","#253494","#7fcdbb","#ffffcc","#c7e9b4"];
             var colors = {"Georgetown University": "#41b6c4", "White Marsh": "#2c7fb8", "St. Thomas's Manor": "#253494", "Newtown": "#7fcdbb", "St. Inigoes": "#ffffcc","West Oak Plantation": "#c7e9b4", "Chatham Plantation": "red"}
-            var svg = d3.select(".map")
+            var svg = d3.select("#routeMap")
+            width = $("#routeMapContainer").width();
+            height = $("#routeMapContainer").height();
 
             var locations = svg.selectAll('g')
                 .data(plantationData)
@@ -87,16 +85,13 @@ $(document).ready(function() {
                 .append("g")
 
             locations.append("circle")
-                .attr("id", function(d) {
-                    return d.name_id })
+                .attr("id", function(d) { return d.name_id })
                 .attr("class", "location")
                 .attr("cx", function(d) {return projection([d.lon, d.lat])[0]})
                 .attr("cy", function(d) {return projection([d.lon, d.lat])[1];})
                 .attr("r", 5)
-                .attr("stroke", function(d, i) {
-                    return "white";})
-                .attr("fill", function(d, i) {
-                    return colors[d.name];})
+                .attr("stroke", function(d, i) { return "white";})
+                .attr("fill", function(d, i) { return colors[d.name];})
 
             var person = svg.selectAll('g')
                 .data(personData)
@@ -104,32 +99,19 @@ $(document).ready(function() {
                 .append("g")
 
             person.append("circle")
-                .attr("id", function(d)
-                {
-                    return d.pid})
+                .attr("id", function(d) {return d.pid })
                 .attr("class", "person")
-                .attr("cx", function(d) {
-                    return projection([d.longitude, d.lat])[0]
-                })
-                .attr("cy", function(d) {
-                    return projection([d.longitude, d.lat])[1];
-                })
+                .attr("cx", function(d) { return projection([d.longitude, d.lat])[0]; })
+                .attr("cy", function(d) { return projection([d.longitude, d.lat])[1]; })
                 .attr("r", 4)
-                // .attr("stroke", function(d, i) {
-                // 	return "white";
-                // })
-                .attr("fill", function(d, i) {
-                    return colors[d.name];
-                })
+                .attr("fill", function(d, i) { return colors[d.name]; })
 
             var legend = svg.append("g")
                 .attr("class", "map-legend")
-                .attr("width", "50px")
-                .attr("height", "20px")
+                .attr("width", width / 5)
+                .attr("height", height / 4)
                 .attr("transform", function(d) {
-                    var map = d3.select('.map').node();
-                    var mapHeight = map.getBoundingClientRect().height
-                    return "translate("+ width * 0.425 + ", "+ mapHeight * 0.55 +")"
+                    return "translate(" + projection([-77.787300, 32.671992]) + ")";
                 });
 
             legend.selectAll("text")
@@ -159,6 +141,7 @@ $(document).ready(function() {
         });
     });
 });
+
 var colors = {"Georgetown University": "#41b6c4", "White Marsh": "#2c7fb8", "St. Thomas's Manor": "#253494", "Newtown": "#7fcdbb", "St. Inigoes": "#ffffcc","West Oak Plantation": "#c7e9b4", "Chatham Plantation": "red"}
 
 function shuffleElements(array) {
@@ -172,12 +155,9 @@ function shuffleElements(array) {
 }
 
 function transition(point, route) {
-    // console.log(point)
-    // console.log(route)
-    // setTimeout(function() {
     var l = route.node().getTotalLength();
     point.transition()
-        .duration(2000)
+        .duration(1500)
         .attrTween("transform", delta(point, route.node()))
         .attr("fill", function(d) {
             if (d.dest == "chathamplantation") {
@@ -185,8 +165,6 @@ function transition(point, route) {
             }
             return colors["West Oak Plantation"]
         });
-    // transition(point, route)
-    // }, 50);
 }
 
 function delta(point, path) {
@@ -204,16 +182,17 @@ function delta(point, path) {
 function myLoop(i){
     setTimeout(function() {
         $(shuffledPersons[i]).css("color", function() {return colors[$(shuffledPersons[i])[0].__data__.name]})
-        var plantation = $(shuffledPersons[i])[0].__data__.name_id
-        var dest = $(shuffledPersons[i])[0].__data__.dest
-        var id = $(shuffledPersons[i])[0].__data__.pid
-        if (dest != "") {
-            var route = plantation + "2" + dest
-            console.log(route)
-            transition(d3.select("#" + id), d3.select("#" + route))
+        if ($(shuffledPersons[i])[0].__data__.name_id != undefined) {
+            var plantation = $(shuffledPersons[i])[0].__data__.name_id
+            var dest = $(shuffledPersons[i])[0].__data__.dest
+            var id = $(shuffledPersons[i])[0].__data__.pid
+            if (dest != "") {
+                var route = plantation + "2" + dest
+                transition(d3.select("#" + id), d3.select("#" + route))
+            }
+            i++;
+            myLoop(i)  
         }
-        i++;
-        myLoop(i)
     }, 100);
 }
 
@@ -222,6 +201,9 @@ function animateMap() {
     shuffledPersons = shuffleElements(persons)
     var i = 0
     myLoop(i)
-
 }
 
+function scaleMap() {
+    var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+}
