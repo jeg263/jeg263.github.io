@@ -295,10 +295,17 @@ function controllerMain() {
         //typeahead family filter
         csvData = csvJSON(chord.originalData).map(function(p) {p.id = Number(p.id); return p;});
         var names = csvData.map(function(p) {return p.last_name}).reduce(function(p,c,i,a){
+<<<<<<< HEAD:js/pathwayControls.js
                 if (p.indexOf(c) == -1) p.push(c);
                 else p.push('')
                 return p;
             }, []);
+=======
+            if (p.indexOf(c) == -1) p.push(c);
+            else p.push('')
+            return p;
+        }, []);
+>>>>>>> origin/master:js/visualizationControls.js
         $("#inputFamily").typeahead({ source:names });
 
         //show otherData checkbox
