@@ -70,7 +70,7 @@ function chordDiagramMain() {
         //load data
         $.ajax({
             type: "GET",
-            url: "./data/gu272.csv",
+            url: "./data/gsaDataFile.csv",
             dataType: "text",
             success: function(data) {
                 //Set original data

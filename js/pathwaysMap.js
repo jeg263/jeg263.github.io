@@ -30,18 +30,12 @@ function mapMain() {
             //Width and height of map
             var width = d3.select("#pathwaysHistory")._groups[0][0].clientWidth;
             var height = d3.select("#pathwaysHistory")._groups[0][0].clientHeight;
-
-            console.log("start", width, height);
-
             // Bind the data to the SVG and create one path per GeoJSON feature
             var svg = d3.select("#pathwaysMap")
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height)
                 .attr("class", "map");
-
-            console.log("beg", svg);
-
             svg.selectAll("path")
                 .data(mapData.features)
                 .enter()
@@ -59,9 +53,6 @@ function mapMain() {
                 .style("stroke", "#fff")
                 .style("stroke-width", "1")
                 .style("fill", "#b6babd");
-
-            console.log("path", path);
-
             continueSetup();
         });
     };
@@ -73,9 +64,6 @@ function mapMain() {
             plantationData = data;
             plantationData = plantationData.map(function(d) { d.originalName = d.name; d.name = cleanName(d.name); return d}); //get plantation names
             mapSVG = d3.select(".map");
-
-            console.log("map", mapSVG);
-
             plantationSelection = d3.select(".map") //hide anything that is not a plantation (i.e. Georgetown)
                 .selectAll('g')
                 .data(plantationData)
@@ -157,12 +145,15 @@ function mapMain() {
 
     mapData.updateMap = function() {
 
-        if (d3JsonCalled === false) {
+        if (!d3JsonCalled) {
             console.log("d3false");
             callD3JSON();
         }
+        else if (mapData.mapSourcePlantation == "" || mapData.mapDestinationPlantation == "") {
+            return;
+        }
         else {
-            console.log("d3Finished");
+            // console.log("d3Finished");
             var colors = ["#FF8000","#0077C5","#FFDC12","#008380","#D52B1E","#53B447"]; //colors for map
             mapSourcePlantation = mapData.mapSourcePlantation;
             mapDestinationPlantation = mapData.mapDestinationPlantation;
@@ -170,7 +161,7 @@ function mapMain() {
             mapSVG.selectAll("#migrationPath").remove(); //remove old path between source and destination
             mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
 
-            if (mapDestinationPlantation !== "") {
+            if (mapDestinationPlantation != null) {
                 d3.select("#mapOtherLabel").classed("hidden-other-label", true); //hide warning messages
                 d3.select('#noMapData').classed("hidden-other-label", true);
 
@@ -201,23 +192,24 @@ function mapMain() {
                         return "not_plantation";
                     }
                 });
-
-
                 var lineGenerator = d3.line() //start line drawing between two points
                     .curve(d3.curveCardinal);
 
+                // if (mapSourcePlantation != null && mapDestinationPlantation != null) {
                 var points = mapData.getCoordinatesForPath(mapSourcePlantation, mapDestinationPlantation); //get coordinates to draw points thorugh
-
                 points = points.map(function (p) {
                     return projection(p)
-                });
-
-
+                });        
+                
                 //
                 // Draw Gradient line
                 //
-
                 var pathData = lineGenerator(points);
+                // }
+
+
+
+                
 
                 //Gradient line functions
                 // Compute stroke outline for segment p12.
@@ -255,7 +247,6 @@ function mapMain() {
                 }
                 // Sample the SVG path uniformly with the specified precision.
                 function samples(path, precision) {
-                    console.log(path);
                     var n = path.getTotalLength(), t = [0], i = 0, dt = precision;
                     while ((i += dt) < n) t.push(i);
                     t.push(n);

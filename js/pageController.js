@@ -31,12 +31,14 @@ function scrollToSection(type, id, action) {
 // Full page scroll 
 $(document).ready(function() {
     $('#fullpage').fullpage({
-        sectionsColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
-        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'gu272FamilyTrees', 'about'],
+        sectionsColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
+        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'about'],
         menu: '#menu',
         scrollOverflow: true,
         autoScrolling: false,
     });
+
+    //'gu272FamilyTrees' //'#ffffff'
 });
 
 //Hover event listener
@@ -66,16 +68,17 @@ $(document).scroll(function() {
         else if (y < $('#titlePage').height() + $('#historyPage').height() + 
             $('#passagePage').height() + $('#pathwaysPage').height()) {
             $('#heading-bar-subtitle').html("Pathways");
+            // controller.forceReload();
         }
         else if (y < $('#titlePage').height() + $('#historyPage').height() + 
             $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height()) {
             $('#heading-bar-subtitle').html("Demographics");
         }
-        else if (y < $('#titlePage').height() + $('#historyPage').height() + 
-            $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height() + 
-            $('#familyTreePage').height()) {
-            $('#heading-bar-subtitle').html("Family Trees");
-        }
+        // else if (y < $('#titlePage').height() + $('#historyPage').height() +
+        //     $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height() +
+        //     $('#familyTreePage').height()) {
+        //     $('#heading-bar-subtitle').html("Family Trees");
+        // }
         else {
             $('#heading-bar-subtitle').html("About");
         }

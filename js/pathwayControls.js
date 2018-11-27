@@ -3,6 +3,7 @@ var controller = {};
 function controllerMain() {
     var showChord = true;
     var showMap = false;
+    var showFamily = false;
     var selectPersonSearchTerm = "";
     var familySearchTerm = "";
     var ageSearchTerm = "";
@@ -35,6 +36,7 @@ function controllerMain() {
         $("#chordSelector").change(function(result){ //if chaning to root wheel display it
             showChord = true;
             showMap = false;
+            showFamily = false;
             showHidePanels();
         });
         $("#mapSelector").change(function(result){ //display map
@@ -42,17 +44,22 @@ function controllerMain() {
             //     enjoyhint_instance.trigger('next');
             showChord = false;
             showMap = true;
+            showFamily = false;
             showHidePanels();
         });
         $("#familySelector").change(function(result){ //show family tree
             showChord = false;
             showMap = false;
+            showFamily = true;
             showHidePanels();
         });
         function showHidePanels() { //show panels based on what is selected
             d3v2.select("#bundle").classed("hidden", !showChord);
             d3v2.select("#mapContainer").classed("hidden", !showMap);
             d3v2.select("#mapContainer").classed("opacity0", false);
+
+            d3v2.select("#familyTreeContainer").classed("hidden", !showFamily);
+            d3v2.select("#familyTreeContainer").classed("opacity0", false);
 
             d3v2.select("#chordControlsContainer").classed("hidden", !showChord);
         }
@@ -224,6 +231,10 @@ function controllerMain() {
         });
         $( "#magnifyNamesConditionBox" ).prop( "checked", chord.magnifyNamesConditionBox );
     });
+    controller.forceReload = function() {
+        var combinedFilter = getCombinedFilter();
+        chord.refreshVisualization(null);
+    };
     function getCombinedFilter() { //build filter for data based on options on right side
         var ageFilter = function (p) {
             if (ageSearchTerm === "")
@@ -261,13 +272,14 @@ function controllerMain() {
                 return p.farm_name === plantationFilterOption;
         };
 
-        //Family filter
-        var familyCSVData = csvJSON(chord.originalData).map(function(p) {p.id = Number(p.id); return p;});
-        var familyIds = (familyCSVData.filter(function (p) { return p.last_name === familySearchTerm }))[0];
-        var familyArray = (familyIds) ? family.findFamilySetForId(familyIds.id) : [];
-
         var directFamilyLineFilter = function (p) {
-            return (familyArray.length > 0 && familySearchTerm !== "") ? containsObject(p.id, familyArray) : true;
+            //Family filter
+            var familyCSVData = csvJSON(chord.originalData).map(function(p) {p.id = Number(p.id); return p;});
+            var familyIds = (familyCSVData.filter(function (p) { return p.last_name === familySearchTerm }))[0];
+            var familyArray = (familyIds) ? family.findFamilySetForId(familyIds.id) : [];
+
+
+            return (familyArray && familyArray.length > 0 && familySearchTerm !== "") ? containsObject("" + p.id, familyArray) : true;
         };
 
         var combinedFilter = function (p) { //build a filter function that is a combination of all the others above
@@ -321,6 +333,7 @@ function controllerMain() {
         mapData.mapSourcePlantation = personData.origin;
         mapData.updateMap(); //update map
         chord.selectNodeWithData(personData); //update roots wheel
+        family.refreshTreeWIthSelectedPerson(personData);
     };
     controller.deselectEnslavedPerson = function() {
         $("#selectPerson").val(""); //undo all data and update visualizations
@@ -328,6 +341,7 @@ function controllerMain() {
         mapData.mapSourcePlantation = "";
         mapData.updateMap();
         chord.deselectAllNodes();
+        family.refreshTreeWIthSelectedPerson(null);
     };
     controller.didUpdateMultiplier = function () { //on multiplier change change slider value to keep in line with actual multiplier
         $(document).ready(function() {

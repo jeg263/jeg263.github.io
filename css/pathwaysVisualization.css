@@ -370,3 +370,6 @@ li.fake-line {
 .opacity0 {
     opacity: 0;
 }
+#familyTreeContainer.opacity0 {
+    display: none;
+}

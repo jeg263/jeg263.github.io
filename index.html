@@ -33,6 +33,69 @@
     <!--Integration Style Sheets-->
     <link type="text/css" rel="stylesheet" href="./css/style.css"/>
 
+    <!--New Tree Stuff-->
+    <script src="dependencies/lodash.js"></script>
+
+    <style>
+        /*body {*/
+        /*font: 10px sans-serif;*/
+        /*}*/
+
+        #graphMapWhat {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 50%;
+        }
+        .nodeText, .emphasis {
+            font: 16px sans-serif;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .family-tree svg {
+            float: left;
+        }
+
+        .linage {
+            fill: none;
+            stroke: #000;
+        }
+
+        .marriage {
+            fill: none;
+            stroke: black;
+        }
+
+        .man {
+            background-color: lightblue;
+            border-style: solid;
+            border-width: 1px;
+        }
+        .selected-man {
+            background-color: pink;
+            border-style: solid;
+            border-width: 1px;
+        }
+
+        .woman {
+            background-color: bisque;
+            border-style: solid;
+            border-width: 1px;
+        }
+
+        .emphasis {
+            font-style: italic;
+        }
+
+        p {
+            padding: 0;
+            margin: 0;
+        }
+
+    </style>
+
+    <script src="dependencies/tree.js"></script>
+
 
 </head>
 <body>
@@ -81,9 +144,9 @@
             <div class="link-item">
                 <a class="gu272Demographics" href="#gu272Demographics">Demographics</a>
             </div>
-            <div class="link-item">
-                <a class="gu272FamilyTrees" href="#gu272FamilyTrees">Family Trees</a>
-            </div>
+            <!--<div class="link-item">-->
+                <!--<a class="gu272FamilyTrees" href="#gu272FamilyTrees">Family Trees</a>-->
+            <!--</div>-->
             <div class="link-item">
                 <a class="about" href="#about">About</a>
             </div>
@@ -105,9 +168,9 @@
                     <div class="link-item">
                         <a class="gu272Demographics" href="#gu272Demographics">Demographics</a>
                     </div>
-                    <div class="link-item">
-                        <a class="gu272FamilyTrees" href="#gu272FamilyTrees">Family Trees</a>
-                    </div>
+                    <!--<div class="link-item">-->
+                        <!--<a class="gu272FamilyTrees" href="#gu272FamilyTrees">Family Trees</a>-->
+                    <!--</div>-->
                     <div class="link-item">
                         <a class="about" href="#about">About</a>
                     </div>
@@ -142,6 +205,8 @@
                                In June 1838, the head of the Maryland Jesuits Rev. Thomas Mulledy S.J. sold 272 enslaved men, women, and children. The buyers were Henry Johnson, a member of the House of Representatives from Louisiana, and Jesse Beatty, another Louisiana planter. The sale was worth about $3.3 million in today's dollars. Part of the proceeds went to pay the debts of Georgetown College.
                                <br><br>
                                This project uses data visualization to illustrate information such as the names, ages, journeys, and ultimately the stories of the GU272.
+                               <br><br>
+                               Historical and genealogical research about the GU272 is a work in progress.  The data reported below is provided primarily for the purpose of demonstrating the power and usefulness of some data visualization tools and techniques. This data may contain unintentional errors, inaccuracies, and omissions.
                             </div>
                         </div>
                     </div>
@@ -195,6 +260,8 @@
         </div>
         <div style="background: #f4f5f8; width: 100%; height: calc(100VH - 54px); position: relative">
             <div id="left-container" class="stage-shrink" style="float: left; width: 60%; height: 100%; border-top: 1px #eceef1 solid; overflow: scroll;">
+                <!--Roots Wheel container-->
+                <div id="bundle" style="position: relative; min-width: 100%; display: inline-block"></div>
                 <!--Map data-->
                 <div id="mapContainer" class="opacity0" style="width: 100%; height: 100%; text-align: center; position:relative; overflow: hidden">
                     <div id="noMapData" class="no-map-data-container">
@@ -203,14 +270,16 @@
                     <label id="mapOtherLabel" class="map-other-label hidden-other-label">
                         No buyer data
                     </label>
-                    <div id="mapBox" style="height: 553px; width: 600px; overflow: visible; display: inline-block; position: absolute;margin: auto;top: 0;right: 0;bottom: 0;wleft: 0;">
+                    <div id="mapBox" style="height: 553px; width: 600px; overflow: visible; display: inline-block; position: absolute;margin: auto;top: 0;right: 0;bottom: 0;left: 0;">
                         <div id="pathwaysHistory" class="page" style="width: 100%; height: 1630px;">
                             <div id="pathwaysMap" class="fixed" style="width: 100%; height: 100%; float: left;"></div>
                         </div>
                     </div>
                 </div>
-                <!--Roots Wheel container-->
-                <div id="bundle" style="position: relative; min-width: 100%; display: inline-block"></div>
+                <!--Family container-->
+                <div id="familyTreeContainer" class="opacity0" style="width: 100%; height: 100%; text-align: center; position:relative; overflow: hidden">
+                    <div class="family-tree" id="graphMapWhat"></div>
+                </div>
             </div>
             <div id="right-positioning-container" class="arrow-positioning-container stage-open">
                 <!--Button to move panel-->
@@ -223,16 +292,16 @@
                 <!--Selector-->
                 <div id="selector-box" style="display: block; margin-bottom: 10px">
                     <div class="btn-group btn-group-toggle visual" data-toggle="buttons">
-                        <label class="btn btn-sm btn-secondary active visual" style="width: 50%">
+                        <label class="btn btn-sm btn-secondary active visual" style="width: 33%">
                             <input type="radio" name="options" id="chordSelector" autocomplete="off" checked> Roots Wheel
                         </label>
-                        <label id="mapSelectorButton" class="btn btn-sm btn-secondary visual" style="width: 50%">
+                        <label id="mapSelectorButton" class="btn btn-sm btn-secondary visual" style="width: 34%">
                             <input type="radio" name="options" id="mapSelector" autocomplete="off"> Map
                         </label>
                         <!--Family Trees box - possible addition to visualization-->
-                        <!--<label class="btn btn-sm btn-secondary visual">-->
-                        <!--<input type="radio" name="options" id="familySelector" autocomplete="off"> Family Trees-->
-                        <!--</label>-->
+                        <label class="btn btn-sm btn-secondary visual" style="width: 33%">
+                            <input type="radio" name="options" id="familySelector" autocomplete="off"> Family Trees
+                        </label>
                     </div>
                 </div>
 
@@ -406,46 +475,46 @@
         </div>
         <div style="height: 30vh"></div>
     </div>
-    <div id="familyTreePage" class="section">
-        <div style="width: 100%; height: 54px;">
-        </div>
-        <div class="familyTreePageContainer">
-            <div class="row px-3 py-4">
-                <div class="col">
-                    <button type="button" class="btn btn-light button">
-                        <img src="images/clicker.svg" style="height: 1.2em; width: 1.2em"></img>
-                            Hover/click trees for more information
-                    </button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 col-sm-6">
-                    <div class="treeContainer"></div>
-                </div>
-                <div class="col-lg-2 col-sm-6" style="padding-left:0px; padding-right:0px">
-                    <div class="treeContainer"></div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="treeContainer"></div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="treeContainer"></div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="treeContainer"></div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="treeContainer"></div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="treeContainer"></div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="treeContainer"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!--<div id="familyTreePage" class="section">-->
+        <!--<div style="width: 100%; height: 54px;">-->
+        <!--</div>-->
+        <!--<div class="familyTreePageContainer">-->
+            <!--<div class="row px-3 py-4">-->
+                <!--<div class="col">-->
+                    <!--<button type="button" class="btn btn-light button">-->
+                        <!--<img src="images/clicker.svg" style="height: 1.2em; width: 1.2em"></img>-->
+                            <!--Hover/click trees for more information-->
+                    <!--</button>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="row">-->
+                <!--<div class="col-lg-4 col-sm-6">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-2 col-sm-6" style="padding-left:0px; padding-right:0px">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-3 col-sm-6">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-3 col-sm-6">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-3 col-sm-6">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-3 col-sm-6">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-3 col-sm-6">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-3 col-sm-6">-->
+                    <!--<div class="treeContainer"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
     <div id="aboutPage" class="section">
         <div style="background: #f4f5f8; width: 100%; height: calc(100VH - 54px); margin-top:54px; position: relative">
             <div class="container d-flex h-100">
@@ -465,7 +534,9 @@
                         </p>
                         </br><br>
                         <h4>Jonathan Gibson</h4>
-                        <p class="about-text"> 
+                        <p class="about-text">
+                            Georgetown Slavery Archive Digital Fellow 2019
+                            <br>
                             American Studies and Computer Science (COL '19)
                             <br>
                             <a id="jon-email" href="mailto:jeg263@georgetown.edu">Email</a> |
@@ -478,9 +549,10 @@
                         <h3>Learn More</h3>
                         <hr>
                         <ul class="about-text">
-                            <li><a id="descendants-webite"href="https://www.gu272.net/members/gu272/">GU272 Descendants Association</a></li>
+                            <li><a id="descendants-website"href="https://www.gu272.net/members/gu272/">GU272 Descendants Association</a></li>
                             <li><a id="gsa-website" href="https://slaveryarchive.georgetown.edu/">Georgetown Slavery Archive</a></li>
                             <li><a id="slavery-website" href="http://slavery.georgetown.edu/">Slavery, Memory, and Reconciliation</a></li>
+                            <li><a id="memory-project" href="http://www.georgetownmemoryproject.org/">Georgetown Memory Project</a></li>
                         </ul>
                         <br><br>
                         <h3>Source Code + Data</h3>
