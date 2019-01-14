@@ -149,7 +149,24 @@ function mapMain() {
             console.log("d3false");
             callD3JSON();
         }
-        else if (mapData.mapSourcePlantation == "" || mapData.mapDestinationPlantation == "") {
+        else if (mapData.mapSourcePlantation === "" && mapData.mapDestinationPlantation === "") {
+            mapSVG.selectAll("#migrationPath").remove(); //remove old path between source and destination
+            mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
+
+            d3.select("#mapOtherLabel").classed("hidden-other-label", true);
+            d3.select('#noMapData').classed("hidden-other-label", false);
+
+            plantationSelection.attr("class", function(d) {
+                // if (d.name !== "GeorgetownUniversity" && d.name === mapSourcePlantation) {
+                //     return "plantation";
+                // }
+                // else {
+                return "not_plantation";
+                // }
+            });
+            return;
+        }
+        else if (mapData.mapSourcePlantation === "" || mapData.mapDestinationPlantation === "") {
             return;
         }
         else {

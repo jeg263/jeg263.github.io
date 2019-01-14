@@ -3,6 +3,50 @@
 
 var allNodesGlobal = null;
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var superOpts;
+var superFamilyName = "";
+
+function updateFamilyTreeText(text) {
+
+    if (text)
+        superFamilyName = text;
+    else
+        text = superFamilyName;
+
+    // var newSvg = this.svg.select('.g');
+    // var newnewSvg = d3.select('.g').height();
+    // var newNSvg = d3.select('g').height();
+    // var n = d3.select(opts.target).select('g').height();
+
+    // var opts = this.opts;
+    var height = superOpts.height + superOpts.margin.top + superOpts.margin.bottom;
+    var textSizingContainer = d3.select('#text-sizing-container').node().getBoundingClientRect();
+    var textHeight = textSizingContainer.height;
+    var newTextHeight = (height - textHeight) / 2 - 65;
+
+    d3.selectAll('#tree-family-name-text').remove();
+
+    var newSvgThing = d3.select(superOpts.target).select('svg');
+    var svgThingWidth = newSvgThing.node().getBoundingClientRect().width;
+
+    var newText = newSvgThing.append('text').attr('font-size', '22px').attr('font-weight', '600').text(function () {
+        return "Hawkins Family";
+    });
+    var textWidth = newText.node().getBoundingClientRect().width / 2;
+    var whatIsThis = textSizingContainer.width / 2;
+    var finalWidth = (svgThingWidth / 2) - textWidth;
+    newText.remove();
+    // this.svg.select('#tree-family-name-text').remove();
+
+    newText = newSvgThing.append('text').attr('font-size', '22px').attr('font-weight', '600').text(function () {
+        if (text !== "Unknown")
+            return text + " Family";
+        else
+            return "";
+    }).attr('transform', 'translate(' + finalWidth + ',' + newTextHeight + ')').attr("id", "tree-family-name-text")
+
+    // console.log(d3.select('#text-sizing-container').node().getBoundingClientRect().height)
+}
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -10,6 +54,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : global.dTree = factory();
 })(this, function () {
     'use strict';
+    var idMap = {};
 
     var TreeBuilder = (function () {
         function TreeBuilder(root, siblings, opts) {
@@ -36,6 +81,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function create() {
 
                 var opts = this.opts;
+                superOpts = this.opts;
                 var allNodes = this.allNodes;
                 var nodeSize = this.nodeSize;
 
@@ -43,9 +89,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var height = opts.height + opts.margin.top + opts.margin.bottom;
 
                 //make an SVG
+                var newHeight = height / 2;
                 // var svg = this.svg = d3.select(opts.target).append('svg').attr('width', width).attr('height', height).call(zoom).append('g').attr('transform', 'translate(' + opts.margin.left + ',' + opts.margin.top + ')');
-                var svg = this.svg = d3.select(opts.target).append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate(' + parseFloat(opts.margin.left - 190) + ',' + height / 2 + ')');
+                var svg = d3.select(opts.target).append('svg').attr('width', width).attr('style', 'overflow: visible').attr('height', height);
 
+                // console.log("start looking for family text");
+                // console.log(height);
+                // console.log(newHeight);
+                //
+                // var textStart = (height - newHeight) / 2;
+                // console.log(textStart);
+
+                // svg.append('text').attr('id', 'tree-family-name-text').attr('transform', 'translate(' + parseFloat(opts.margin.left - 190) + ',' + textStart + ')').attr('width', '' + width).text(function () {
+                //     return "Hawkins Family";
+                // });
+
+                this.svg = svg = svg.append('g').attr('id', 'text-sizing-container').attr('transform', 'translate(' + parseFloat(opts.margin.left - 190) + ',' + newHeight + ')');
 
                 // Compute the layout.
                 this.tree = d3.tree().nodeSize([nodeSize[1] * 2.5, nodeSize[0] * 2]);
@@ -65,6 +124,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function _update(source) {
 
                 var opts = this.opts;
+                superOpts = this.opts;
                 var allNodes = this.allNodes;
                 var nodeSize = this.nodeSize;
 
@@ -106,8 +166,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     if (d.data.hidden) {
                         return;
                     }
-                    opts.callbacks.nodeClick(d.data, d.data.extra, d.data.id);
+                    console.log(idMap);
+
+                    var newData = d.data;
+                    newData.id = parseInt(idMap[d.data.id]);
+                    opts.callbacks.nodeClick(d.data, d.data.extra, newData.id);
                 });
+
+
+
+                updateFamilyTreeText(superFamilyName);
             }
         }, {
             key: '_flatten',
@@ -352,7 +420,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         VERSION: '2.0.2',
 
         init: function init(data) {
+            if (data && data.length > 0) {
+                superFamilyName = data[data.length - 1];
+                data.pop();
+            }
+
             var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+            // this.familyName = family;
 
             var opts = _.defaultsDeep(options || {}, {
                 target: '#graph',
@@ -418,6 +492,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     textClass: person.textClass ? person.textClass : opts.styles.text,
                     'class': person['class'] ? person['class'] : opts.styles.node
                 };
+                idMap[id - 1] = person.id;
 
                 // hide linages to the hidden root node
                 if (parent == root) {
@@ -466,7 +541,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     var spouse = null;
 
-                    if (sp)
+                    if (sp) {
                         spouse = {
                             name: sp.name,
                             id: id++,
@@ -478,6 +553,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             extra: sp.extra,
                             marriageNode: m
                         };
+                        idMap[id - 1] = sp.id;
+                    }
                     else {
                         spouse = { id: node.id }
                     }

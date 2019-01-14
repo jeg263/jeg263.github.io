@@ -177,11 +177,14 @@ function updateTree(person, personObj, treeObj) {
             if (searchTree(person, family.treeFamilyData[j]))
             {
                 newParents = [family.treeFamilyData[j]];
+                break;
             }
         }
     }
         // newParents = [family.treeFamilyData[1]];
 
+    // if (newParents && newParents.length > 0)
+    //     newParents = newParents[0];
     for (var par in newParents) {
         function getLongestParent(parent) {
             if (parent.marriages && parent.marriages.length > 0) {
@@ -247,9 +250,14 @@ function updateTree(person, personObj, treeObj) {
 
         var treeData = newParents[par];
         if (person)
-            treeData = setColorToSelected(newParents[par], person)
+            treeData = setColorToSelected(newParents[par], person);
 
-        dTree.init([treeData], {
+
+        var familyName = personObj.last_name;
+        if (familyName === "")
+            familyName = "Unknown";
+
+        dTree.init([treeData, familyName], {
             target: "#graphMapWhat",
             debug: true,
             height: hundredMultiplier,
@@ -257,11 +265,11 @@ function updateTree(person, personObj, treeObj) {
             nodeWidth: 100,
             callbacks: {
                 nodeClick: function (clickedData, extra) {
-                    // // controller.selectEnslavedPerson()
+                    // controller.selectEnslavedPerson()
+                    if (clickedData.class === "man")
+                        didSelectTreeNodeWith(clickedData.id);
                     // if (clickedData.class === "man")
-                    //     didSelectTreeNodeWith(clickedData.id);
-                    // // if (clickedData.class === "man")
-                    // //     updateTree(clickedData.id, null, clickedData);
+                    //     updateTree(clickedData.id, null, clickedData);
                 },
                 textRenderer: function (name, extra, textClass) {
                     if (extra && extra.nickname)
@@ -270,20 +278,21 @@ function updateTree(person, personObj, treeObj) {
                 }
             }
         });
+        break;
     }
 }
 function setColorToSelected(tree, person) {
 
     function searchTree(id, node) {
-        if (node.id === "" + id)
+        if (node.id === "" + id) {
             node.class = "selected-man";
-        else {
-            if (node.class === "selected-man") {
-                node.class = "man";
+            if (node.marriages && node.marriages.length > 0) {
+                if (node.marriages[0].spouse.id !== "" + id && node.marriages[0].spouse.class !== "woman")
+                    node.marriages[0].spouse.class = "man";
             }
             if (node.marriages && node.marriages.length > 0) {
                 if (node.marriages[0].spouse.id === "" + id)
-                    node.class = "selected-man";
+                    node.marriages[0].spouse.class = "selected-man";
                 else {
                     if (node.marriages[0].spouse.class === "selected-man") {
                         node.marriages[0].spouse.class = "man";
@@ -292,6 +301,25 @@ function setColorToSelected(tree, person) {
                         for (var c in node.marriages[0].children) {
                             searchTree(id, node.marriages[0].children[c]);
                         }
+                    }
+                }
+            }
+        }
+        else {
+            if (node.class === "selected-man") {
+                node.class = "man";
+            }
+            if (node.marriages && node.marriages.length > 0) {
+                if (node.marriages[0].spouse.id === "" + id && node.marriages[0].spouse.class !== "woman")
+                    node.marriages[0].spouse.class = "selected-man";
+                else {
+                    if (node.marriages[0].spouse.class === "selected-man") {
+                        node.marriages[0].spouse.class = "man";
+                    }
+                }
+                if (node.marriages[0].children && node.marriages[0].children.length > 0) {
+                    for (var c in node.marriages[0].children) {
+                        searchTree(id, node.marriages[0].children[c]);
                     }
                 }
             }
@@ -327,6 +355,7 @@ function didSelectTreeNodeWith(id) {
 family.refreshTreeWIthSelectedPerson = function(familyData) {
 
     if (familyData) {
+        d3.select('#noTreeData').classed("hidden-other-label", true);
         var idEnd = familyData.id;
         var newID = "";
         for (var i = 0; i < idEnd.length; i++) {
@@ -339,7 +368,11 @@ family.refreshTreeWIthSelectedPerson = function(familyData) {
         updateTree(parseFloat(newID), familyData);
     }
     else {
+        d3.select('#noTreeData').classed("hidden-other-label", false);
         updateTree()
     }
+};
+family.refreshTreeWText = function() {
+    updateFamilyTreeText(null);
 };
 familyMain();

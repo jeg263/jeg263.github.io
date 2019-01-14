@@ -51,7 +51,10 @@ function controllerMain() {
             showChord = false;
             showMap = false;
             showFamily = true;
+
             showHidePanels();
+            family.refreshTreeWText()
+            // setTimeout(family.refreshTreeWText(), 300);
         });
         function showHidePanels() { //show panels based on what is selected
             d3v2.select("#bundle").classed("hidden", !showChord);
