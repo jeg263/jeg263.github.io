@@ -32,7 +32,7 @@ function scrollToSection(type, id, action) {
 $(document).ready(function() {
     $('#fullpage').fullpage({
         sectionsColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
-        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'about'],
+        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'gu272newVizPage', 'about'],
         menu: '#menu',
         scrollOverflow: true,
         autoScrolling: false,
