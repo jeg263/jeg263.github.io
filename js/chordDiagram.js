@@ -67,10 +67,9 @@ function chordDiagramMain() {
             .radius(fisheyeRadius)
             .distortion(fisheyeDistortionFactor);
 
-        //load data
         $.ajax({
             type: "GET",
-            url: "./data/gsaDataFile.csv",
+            url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSziKv8bLNEJRq0UgbAzYp5OJIYTwZXdXPEUX8VlDv0lzUAu4I_tLQVHmYob91BPUaYgCMZnF87mOSl/pub?gid=953071699&single=true&output=csv",
             dataType: "text",
             success: function(data) {
                 //Set original data
@@ -79,6 +78,7 @@ function chordDiagramMain() {
                 resetCSVData();
                 refreshVisualization(null, true);
                 controller.onDataLoad();
+                familyTreeController.onDataLoad();
                 controller.didUpdateMultiplier(); //multiplier was updated above
             }
         });
@@ -115,8 +115,12 @@ function chordDiagramMain() {
             obj.id = cleanName(obj.full_name) + obj.id;
             if (obj.origin && obj.id && obj.destination)
                 return {"name": "root." + obj.origin + "." + obj.id, "visible": true, "imports": ["root." + obj.destination + "." + obj.id], "data": obj}
+            else if (obj.id && obj.destination)
+                return {"name": "root." + "LOther" + "." + obj.id, "visible": true, "imports": ["root." + obj.destination + "." + obj.id], "data": obj}
             else if (obj.origin && obj.id)
                 return {"name": "root." + obj.origin + "." + obj.id, "visible": true, "imports": ["root.KOther." + obj.id], "data": obj}
+            else if (obj.id)
+                return {"name": "root." + "LOther" + "." + obj.id, "visible": true, "imports": ["root.KOther." + obj.id], "data": obj};
             else
                 return null;
         });
@@ -129,7 +133,11 @@ function chordDiagramMain() {
 
             if (obj.origin && obj.id && obj.destination)
                 json.push({"name": "root." + obj.destination + "." + obj.id, "visible": true, "imports": [], "data": obj});
+            else if (obj.id && obj.destination)
+                json.push({"name": "root." + obj.destination + "." + obj.id, "visible": true, "imports": [], "data": obj});
             else if (obj.origin && obj.id)
+                json.push({"name": "root.KOther." + obj.id, "visible": true, "imports": [], "data": obj});
+            else if (obj.id)
                 json.push({"name": "root.KOther." + obj.id, "visible": true, "imports": [], "data": obj});
         }
         //Reset CSV data so next time it is used it is not modified by the above code
@@ -196,7 +204,7 @@ function chordDiagramMain() {
                 .attr("d", function(d, i) { return line(splines[i]); });
             groupData = svg.selectAll("g.group")
                 .data(nodes.filter(function(d) { return (
-                    d.key ==='HenryJohnson' || d.key ==='JesseBatey' || d.key === 'WhiteMarsh' || d.key === 'StThomassManor' || d.key === 'Newtown' || d.key === 'StInigoes' || d.key === 'KOther')
+                    d.key ==='HenryJohnson' || d.key ==='JesseBatey' || d.key === 'WhiteMarsh' || d.key === 'StThomassManor' || d.key === 'Newtown' || d.key === 'StInigoes' || d.key === 'KOther' || d.key === 'LOther')
                     && d.children; }))
                 .enter().append("group")
                 .attr("class", "group")
@@ -223,9 +231,9 @@ function chordDiagramMain() {
                 .attr("class", "groupArc")
                 .attr("class", function (d) {
                     counter += 1;
-                    if (chord.showOtherData && counter > 7)
+                    if (chord.showOtherData && counter > 8)
                         return "arcs group-filler";
-                    else if (!chord.showOtherData && counter > 6)
+                    else if (!chord.showOtherData && counter > 7)
                         return "arcs group-filler";
                     else
                         return "arcs " + d.className.baseVal;
@@ -242,10 +250,10 @@ function chordDiagramMain() {
             svg.selectAll('g.arc').data(groupData[0]).enter().append("text")
                 .attr("class", function () {
                     counter += 1;
-                    if (chord.showOtherData && counter > 7) {
+                    if (chord.showOtherData && counter > 8) {
                         return "none";
                     }
-                    else if (!chord.showOtherData && counter > 6) {
+                    else if (!chord.showOtherData && counter > 7) {
                         return "none";
                     }
                     else if (chord.multiplier > 0.8) {

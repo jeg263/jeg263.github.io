@@ -32,7 +32,7 @@ function scrollToSection(type, id, action) {
 $(document).ready(function() {
     $('#fullpage').fullpage({
         sectionsColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
-        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'gu272newVizPage', 'about'],
+        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'familyTreePage', 'sankeyPage', 'about'],
         menu: '#menu',
         scrollOverflow: true,
         autoScrolling: false,
@@ -74,11 +74,16 @@ $(document).scroll(function() {
             $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height()) {
             $('#heading-bar-subtitle').html("Demographics");
         }
-        // else if (y < $('#titlePage').height() + $('#historyPage').height() +
-        //     $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height() +
-        //     $('#familyTreePage').height()) {
-        //     $('#heading-bar-subtitle').html("Family Trees");
-        // }
+        else if (y < $('#titlePage').height() + $('#historyPage').height() +
+            $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height() +
+            $('#gu272familyTreesPage').height()) {
+            $('#heading-bar-subtitle').html("Family Trees");
+        }
+        else if (y < $('#titlePage').height() + $('#historyPage').height() +
+            $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height() +
+            $('#gu272familyTreesPage').height() + $('#newVizPage').height()) {
+            $('#heading-bar-subtitle').html("Sankey Visualization");
+        }
         else {
             $('#heading-bar-subtitle').html("About");
         }

@@ -32,6 +32,35 @@ function controllerMain() {
             var combinedFilter = getCombinedFilter(); //build filter
             chord.refreshVisualization(combinedFilter); //refresh visualization using filter
             updateFilterConditionsForSelect(); //Update filter conditions
+            if (familySearchTerm) {
+                var personData = chord.getAllData().filter(function(data) { //find selected person
+                    if (data.data.last_name === familySearchTerm)
+                        return true;
+                    return false;
+                });
+                if (personData && personData.length > 0) {
+                    var indexOfPersonToFilter = 0;
+
+                    for (i = 0; i < personData.length; i++) {
+                        if (personData[i].data.father_id !== "" || personData[i].data.mother_id !== "") {
+                            indexOfPersonToFilter = i;
+                            break;
+                        }
+                    }
+                    family.refreshTreeWIthSelectedPerson(personData[indexOfPersonToFilter].data, true);
+                }
+                    // controller.selectEnslavedPerson(personData[0].data); //select person
+                // // if (enjoyhint_instance)
+                // //     enjoyhint_instance.trigger('next');
+                // var name = personData.full_name.substr(personData.full_name.indexOf(" ") + 1); //get persons name to set to text of input
+                // selectPersonSearchTerm = name;
+                // $("#selectPerson").val(name);
+                // mapData.mapDestinationPlantation = personData.destination; //get data based on selection
+                // mapData.mapSourcePlantation = personData.origin;
+                // mapData.updateMap(); //update map
+                // chord.selectNodeWithData(personData); //update roots wheel
+                // family.refreshTreeWIthSelectedPerson(personData);
+            }
         });
         $("#chordSelector").change(function(result){ //if chaning to root wheel display it
             showChord = true;
@@ -266,7 +295,7 @@ function controllerMain() {
             if (buyerFilterOption === "any")
                 return true;
             else
-                return p.buyer_name === buyerFilterOption;
+                return p.buyer_name === buyerFilterOption.replace(/\s/g, '');
         };
         var plantationFilter = function (p) {
             if (plantationFilterOption === "any")
@@ -274,19 +303,49 @@ function controllerMain() {
             else
                 return p.farm_name === plantationFilterOption;
         };
+        // var directFamilyLineFilter = function (p) {
+        //     return p.last_name === familySearchTerm;
+        // };
+
+        var specializedDirectFamilyLineFilter = function (p) {
+          return p.last_name === familySearchTerm || directFamilyLineFilter(p);
+        };
 
         var directFamilyLineFilter = function (p) {
             //Family filter
             var familyCSVData = csvJSON(chord.originalData).map(function(p) {p.id = Number(p.id); return p;});
-            var familyIds = (familyCSVData.filter(function (p) { return p.last_name === familySearchTerm }))[0];
+
+            var familysToFindId = familyCSVData.filter(function (p) { return p.last_name === familySearchTerm });
+            var indexOfPersonToFilter = 0;
+
+            for (var i = 0; i < familysToFindId.length; i++) {
+                if (familysToFindId[i].father_id !== "" || familysToFindId[i].mother_id !== "") {
+                    indexOfPersonToFilter = i;
+                    break;
+                }
+            }
+            var familyIds = familysToFindId[indexOfPersonToFilter];
             var familyArray = (familyIds) ? family.findFamilySetForId(familyIds.id) : [];
+
+
+            // if (personData && personData.length > 0) {
+            //     var indexOfPersonToFilter = 0;
+            //
+            //     for (i = 0; i < personData.length; i++) {
+            //         if (personData[i].data.father_id !== "" || personData[i].data.mother_id !== "") {
+            //             indexOfPersonToFilter = i;
+            //             break;
+            //         }
+            //     }
+            //     family.refreshTreeWIthSelectedPerson(personData[indexOfPersonToFilter].data, true);
+            // }
 
 
             return (familyArray && familyArray.length > 0 && familySearchTerm !== "") ? containsObject("" + p.id, familyArray) : true;
         };
 
         var combinedFilter = function (p) { //build a filter function that is a combination of all the others above
-            return ageFilter(p) && genderFilter(p) && directFamilyLineFilter(p) && buyerFilter(p) && plantationFilter(p);
+            return ageFilter(p) && genderFilter(p) && specializedDirectFamilyLineFilter(p) && buyerFilter(p) && plantationFilter(p);
         };
         return combinedFilter;
     }

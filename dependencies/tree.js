@@ -8,44 +8,44 @@ var superFamilyName = "";
 
 function updateFamilyTreeText(text) {
 
-    if (text)
-        superFamilyName = text;
-    else
-        text = superFamilyName;
-
-    // var newSvg = this.svg.select('.g');
-    // var newnewSvg = d3.select('.g').height();
-    // var newNSvg = d3.select('g').height();
-    // var n = d3.select(opts.target).select('g').height();
-
-    // var opts = this.opts;
-    var height = superOpts.height + superOpts.margin.top + superOpts.margin.bottom;
-    var textSizingContainer = d3.select('#text-sizing-container').node().getBoundingClientRect();
-    var textHeight = textSizingContainer.height;
-    var newTextHeight = (height - textHeight) / 2 - 65;
-
-    d3.selectAll('#tree-family-name-text').remove();
-
-    var newSvgThing = d3.select(superOpts.target).select('svg');
-    var svgThingWidth = newSvgThing.node().getBoundingClientRect().width;
-
-    var newText = newSvgThing.append('text').attr('font-size', '22px').attr('font-weight', '600').text(function () {
-        return "Hawkins Family";
-    });
-    var textWidth = newText.node().getBoundingClientRect().width / 2;
-    var whatIsThis = textSizingContainer.width / 2;
-    var finalWidth = (svgThingWidth / 2) - textWidth;
-    newText.remove();
-    // this.svg.select('#tree-family-name-text').remove();
-
-    newText = newSvgThing.append('text').attr('font-size', '22px').attr('font-weight', '600').text(function () {
-        if (text !== "Unknown")
-            return text + " Family";
-        else
-            return "";
-    }).attr('transform', 'translate(' + finalWidth + ',' + newTextHeight + ')').attr("id", "tree-family-name-text")
-
-    // console.log(d3.select('#text-sizing-container').node().getBoundingClientRect().height)
+    // if (text)
+    //     superFamilyName = text;
+    // else
+    //     text = superFamilyName;
+    //
+    // // var newSvg = this.svg.select('.g');
+    // // var newnewSvg = d3.select('.g').height();
+    // // var newNSvg = d3.select('g').height();
+    // // var n = d3.select(opts.target).select('g').height();
+    //
+    // // var opts = this.opts;
+    // var height = superOpts.height + superOpts.margin.top + superOpts.margin.bottom;
+    // var textSizingContainer = d3.select('#text-sizing-container').node().getBoundingClientRect();
+    // var textHeight = textSizingContainer.height;
+    // var newTextHeight = (height - textHeight) / 2 - 75;
+    //
+    // d3.selectAll('#tree-family-name-text').remove();
+    //
+    // var newSvgThing = d3.select(superOpts.target).select('svg');
+    // var svgThingWidth = newSvgThing.node().getBoundingClientRect().width;
+    //
+    // var newText = newSvgThing.append('text').attr('font-size', '22px').attr('font-weight', '600').text(function () {
+    //     return "Hawkins Family";
+    // });
+    // var textWidth = newText.node().getBoundingClientRect().width / 2;
+    // var whatIsThis = textSizingContainer.width / 2;
+    // var finalWidth = (svgThingWidth / 2) - textWidth;
+    // newText.remove();
+    // // this.svg.select('#tree-family-name-text').remove();
+    //
+    // newText = newSvgThing.append('text').attr('font-size', '22px').attr('font-weight', '600').text(function () {
+    //     if (text !== "Unknown")
+    //         return text + " Family";
+    //     else
+    //         return "";
+    // }).attr('transform', 'translate(' + finalWidth + ',' + newTextHeight + ')').attr("id", "tree-family-name-text")
+    //
+    // // console.log(d3.select('#text-sizing-container').node().getBoundingClientRect().height)
 }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -104,7 +104,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 //     return "Hawkins Family";
                 // });
 
-                this.svg = svg = svg.append('g').attr('id', 'text-sizing-container').attr('transform', 'translate(' + parseFloat(opts.margin.left - 190) + ',' + newHeight + ')');
+                this.svg = svg = svg.append('g').attr('id', 'text-sizing-container').attr('transform', 'translate(' + parseFloat(opts.margin.left - 415) + ',' + newHeight + ')');
 
                 // Compute the layout.
                 this.tree = d3.tree().nodeSize([nodeSize[1] * 2.5, nodeSize[0] * 2]);
@@ -231,13 +231,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     if (mid[0])
                         linedata = [{
                             x: d.target.y,
-                            y: d.target.x - (d.target.cHeight) - 4
+                            y: d.target.x - (d.target.cHeight) - 30
                         }, {
                             x: ny + (d.target.cWidth / 4),
-                            y: mid[0].x - 5 - 5
+                            y: mid[0].x - 5 - 30
                         }, {
-                            x: d.source.y + 20 + 20,
-                            y: mid[0].x - 5 - 5
+                            x: d.source.y + 20 + 45,
+                            y: mid[0].x - 5 - 30
                         }];
                     else {
                         linedata = [{
@@ -314,19 +314,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                        x: d.source.x,
                        y: d.source.y
                    }, {
-                       x: d.source.x + nodeWidth * 6 / 10 - 10,
+                       x: d.source.x + nodeWidth * 4 / 10 - 20,
                        y: d.source.y
                    }, {
-                       x: d.source.x + nodeWidth * 6 / 10 - 10,
+                       x: d.source.x + nodeWidth * 4 / 10 - 20,
                        y: ny
                    }, {
-                       x: d.target.marriageNode.x - 10,
+                       x: d.target.marriageNode.x - 20,
                        y: ny
                    }, {
-                       x: d.target.marriageNode.x - 10,
+                       x: d.target.marriageNode.x - 20,
                        y: d.target.y
                    }, {
-                       x: d.target.x - 10,
+                       x: d.target.x - 20,
                        y: d.target.y
                    }];
                }

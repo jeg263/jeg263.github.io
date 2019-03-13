@@ -16,7 +16,7 @@ function familyMain() {
                 var spouse = null;
                 if (spouseObj) {
                     spouse = {
-                        "name": spouseObj.first_name,
+                        "name": spouseObj.first_name + " " + spouseObj.last_name,
                         "class": "man",
                         "id": spouseObj.id,
                     };
@@ -29,7 +29,7 @@ function familyMain() {
                 }
 
                 newStructure.push( {
-                    "name": child.first_name,
+                    "name": child.first_name + " " + child.last_name,
                     "textClass": "emphasis",
                     "id": child.id,
                     "class": "man",
@@ -41,7 +41,7 @@ function familyMain() {
             }
             else {
                 newStructure.push({
-                    "name": child.first_name,
+                    "name": child.first_name + " " + child.last_name,
                     "id": child.id,
                     "class": "man"
                 });
@@ -54,7 +54,7 @@ function familyMain() {
     family.processFamilyData = function() {
         $.ajax({
             type: "GET",
-            url: "./data/gsaDataFile.csv",
+            url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSziKv8bLNEJRq0UgbAzYp5OJIYTwZXdXPEUX8VlDv0lzUAu4I_tLQVHmYob91BPUaYgCMZnF87mOSl/pub?gid=953071699&single=true&output=csv",
             dataType: "text",
             success: function(gsaDataCSV) {
                 var localFamilyData = csvFamilyJSON(gsaDataCSV);
@@ -104,21 +104,39 @@ function familyMain() {
             }
         }
     };
-    function flattenJSON(json) { //flatten into an array of sets of ids
-        if (json.children.length > 0) {
+    function flattenJSON(json, checkingSpouse) { //flatten into an array of sets of ids
+        if (json.children && json.children.length > 0) {
             var array = [json.id];
             for (var child in json.children) { //get id's of children to add to set - recursively flatten the tree
                 child = json.children[child];
                 array = array.concat(flattenJSON(child));
             }
+            if (json.spouse && json.spouse.length > 0) {
+                for (var sp in json.spouse) {
+                    var spObj = json.spouse[sp];
+                    if (!checkingSpouse)
+                        array = array.concat(flattenJSON(spObj, true))
+                }
+            }
             return array;
         }
         else {
-            return [json.id]; //just one id
+            if (json.spouse && json.spouse.length > 0) {
+                var array = [json.id];
+                for (var sp in json.spouse) {
+                    var spObj = json.spouse[sp];
+                    if (!checkingSpouse)
+                        array = array.concat(flattenJSON(spObj, true))
+
+                }
+                return array;
+            }
+            else
+                return [json.id]; //just one id
         }
     }
 }
-function updateTree(person, personObj, treeObj) {
+function updateTreeWithSelectedClass(person, personObj, treeObj, selectedClass) {
     var treeDiv = d3.select('#graphMapWhat');
     if (treeDiv) //doesn't run the first time the visualization is created
         treeDiv.selectAll("*").remove();
@@ -136,10 +154,10 @@ function updateTree(person, personObj, treeObj) {
         // newParents = [family.treeFamilyData[1]];
         if (personObj)
             newParents = [{
-                "name": personObj.first_name,
+                "name": personObj.first_name + " " + personObj.last_name,
                 "textClass": "emphasis",
                 "id": personObj.id,
-                "class": "selected-man",
+                "class": selectedClass,
                 "marriages": []
             }];
         else if (treeObj) {
@@ -147,7 +165,7 @@ function updateTree(person, personObj, treeObj) {
                 "name": personObj.name,
                 "textClass": "emphasis",
                 "id": personObj.id,
-                "class": "selected-man",
+                "class": selectedClass,
                 "marriages": []
             }];
         }
@@ -181,7 +199,7 @@ function updateTree(person, personObj, treeObj) {
             }
         }
     }
-        // newParents = [family.treeFamilyData[1]];
+    // newParents = [family.treeFamilyData[1]];
 
     // if (newParents && newParents.length > 0)
     //     newParents = newParents[0];
@@ -249,8 +267,10 @@ function updateTree(person, personObj, treeObj) {
         }
 
         var treeData = newParents[par];
-        if (person)
+        if (person && selectedClass !== "man")
             treeData = setColorToSelected(newParents[par], person);
+        else if (person)
+            resetColors(newParents[par], person);
 
 
         var familyName = personObj.last_name;
@@ -262,7 +282,7 @@ function updateTree(person, personObj, treeObj) {
             debug: true,
             height: hundredMultiplier,
             width: widthFinal,
-            nodeWidth: 100,
+            nodeWidth: 150,
             callbacks: {
                 nodeClick: function (clickedData, extra) {
                     // controller.selectEnslavedPerson()
@@ -280,6 +300,9 @@ function updateTree(person, personObj, treeObj) {
         });
         break;
     }
+}
+function updateTree(person, personObj, treeObj) {
+    updateTreeWithSelectedClass(person, personObj, treeObj, "selected-man");
 }
 function setColorToSelected(tree, person) {
 
@@ -330,6 +353,55 @@ function setColorToSelected(tree, person) {
 
     return tree;
 }
+function resetColors(tree, person) {
+
+    function searchTree(id, node) {
+        if (node.id === "" + id) {
+            node.class = "man";
+            if (node.marriages && node.marriages.length > 0) {
+                if (node.marriages[0].spouse.id !== "" + id && node.marriages[0].spouse.class !== "woman")
+                    node.marriages[0].spouse.class = "man";
+            }
+            if (node.marriages && node.marriages.length > 0) {
+                if (node.marriages[0].spouse.id === "" + id)
+                    node.marriages[0].spouse.class = "man";
+                else {
+                    if (node.marriages[0].spouse.class === "selected-man") {
+                        node.marriages[0].spouse.class = "man";
+                    }
+                    if (node.marriages[0].children && node.marriages[0].children.length > 0) {
+                        for (var c in node.marriages[0].children) {
+                            searchTree(id, node.marriages[0].children[c]);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            if (node.class === "selected-man") {
+                node.class = "man";
+            }
+            if (node.marriages && node.marriages.length > 0) {
+                if (node.marriages[0].spouse.id === "" + id && node.marriages[0].spouse.class !== "woman")
+                    node.marriages[0].spouse.class = "man";
+                else {
+                    if (node.marriages[0].spouse.class === "selected-man") {
+                        node.marriages[0].spouse.class = "man";
+                    }
+                }
+                if (node.marriages[0].children && node.marriages[0].children.length > 0) {
+                    for (var c in node.marriages[0].children) {
+                        searchTree(id, node.marriages[0].children[c]);
+                    }
+                }
+            }
+        }
+    }
+    searchTree(person, tree);
+
+
+    return tree;
+}
 function didSelectTreeNodeWith(id) {
     var personData = chord.getAllData().filter(function(data) { //find selected person
 
@@ -352,7 +424,7 @@ function didSelectTreeNodeWith(id) {
     else
         controller.deselectEnslavedPerson(); //if person doesn't exist deselect
 }
-family.refreshTreeWIthSelectedPerson = function(familyData) {
+family.refreshTreeWIthSelectedPerson = function(familyData, familyRefresh) {
 
     if (familyData) {
         d3.select('#noTreeData').classed("hidden-other-label", true);
@@ -365,7 +437,10 @@ family.refreshTreeWIthSelectedPerson = function(familyData) {
                 newID += q;
             }
         }
-        updateTree(parseFloat(newID), familyData);
+        if (familyRefresh)
+            updateTreeWithSelectedClass(parseFloat(newID), familyData, null, "man");
+        else
+            updateTree(parseFloat(newID), familyData);
     }
     else {
         d3.select('#noTreeData').classed("hidden-other-label", false);

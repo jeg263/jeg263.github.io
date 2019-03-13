@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link type="text/css" rel="stylesheet" href="./dependencies/jquery.fullpage.css">
     <link rel="stylesheet" href="./css/enjoyhint.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
 
     <!-- Visualization Style Sheets-->
     <!-- <link type="text/css" rel="stylesheet" href="./css/timeline.css"/> -->
@@ -41,7 +42,7 @@
         /*font: 10px sans-serif;*/
         /*}*/
 
-        #graphMapWhat {
+        #graphMapWhat, #graphMapWhatTree {
             position: absolute;
             top: 50%;
             transform: translate(-50%, -50%);
@@ -64,12 +65,14 @@
         .marriage {
             fill: none;
             stroke: black;
+            font-style: normal;
         }
 
         .man {
             background-color: lightblue;
             border-style: solid;
             border-width: 1px;
+            font-style: normal;
         }
         .selected-man {
             background-color: pink;
@@ -81,10 +84,11 @@
             background-color: bisque;
             border-style: solid;
             border-width: 1px;
+            font-style: normal;
         }
 
         .emphasis {
-            font-style: italic;
+            /*font-style: italic;*/
         }
 
         p {
@@ -115,8 +119,10 @@
 
 <!--Pathways scripts-->
 <script type="text/javascript" src="./js/familyData.js"></script>
+<script type="text/javascript" src="./js/familyData2.js"></script>
 <script type="text/javascript" src="./js/chordDiagram.js"></script>
 <script type="text/javascript" src="./js/pathwayControls.js"></script>
+<script type="text/javascript" src="./js/familyTreeControls.js"></script>
 
 <div id="fullpage">
     <div id="header" class="header-bar">
@@ -145,7 +151,10 @@
                 <a class="gu272Demographics" href="#gu272Demographics">Demographics</a>
             </div>
             <div class="link-item">
-                <a class="gu272FamilyTrees" href="#gu272newVizPage">Sankey Visual</a>
+                <a class="pathways" href="#familyTreePage">Family Trees</a>
+            </div>
+            <div class="link-item">
+                <a class="gu272FamilyTrees" href="#sankeyPage">Sankey Visual</a>
             </div>
             <!--<div class="link-item">-->
                 <!--<a class="gu272FamilyTrees" href="#gu272FamilyTrees">Family Trees</a>-->
@@ -172,7 +181,10 @@
                         <a class="gu272Demographics" href="#gu272Demographics">Demographics</a>
                     </div>
                     <div class="link-item">
-                        <a class="gu272FamilyTrees" href="#gu272newVizPage">Sankey Visual</a>
+                        <a class="pathways" href="#familyTreePage">Family Trees</a>
+                    </div>
+                    <div class="link-item">
+                        <a class="gu272FamilyTrees" href="#sankeyPage">Sankey Visual</a>
                     </div>
                     <!--<div class="link-item">-->
                         <!--<a class="gu272FamilyTrees" href="#gu272FamilyTrees">Family Trees</a>-->
@@ -275,6 +287,9 @@
                     </div>
                     <label id="mapOtherLabel" class="map-other-label hidden-other-label">
                         No buyer data
+                    </label>
+                    <label id="mapOtherSourceLabel" class="map-other-label hidden-other-label">
+                        No original plantation data
                     </label>
                     <div id="mapBox" style="height: 553px; width: 600px; overflow: visible; display: inline-block; position: absolute;margin: auto;top: 0;right: 0;bottom: 0;left: 0;">
                         <div id="pathwaysHistory" class="page" style="width: 100%; height: 1630px;">
@@ -383,7 +398,7 @@
                      </div>
                      <!--Gender-->
                      <div class="col-sm-3">
-                       <label class="label-header">Gender:</label>
+                       <label class="label-header">Sex:</label>
                        <div class="filter-input-container">
                            <div class="dropdown" style="flex-grow: 1">
                                <button class="btn btn-sm btn-secondary dropdown-toggle input-filter" style="width: 100%" type="button" id="dropdownGenderButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -495,13 +510,83 @@
         </div>
         <div style="height: 30vh"></div>
     </div>
+    <div id="gu272familyTreesPage" class="section">
+        <div style="width: 100%; height: 54px; background: white;">
+        </div>
+        <div style="background: #f4f5f8; width: 100%; height: calc(100VH - 54px); position: relative">
+            <div id="left-containerTree" class="stage-shrink" style="float: left; width: 60%; height: 100%; border-top: 1px #eceef1 solid; overflow: scroll;">
+                <div id="familyTreeContainerTree" style="width: 100%; height: 100%; text-align: center; position:relative; overflow: hidden">
+                    <div id="noTreeDataTree" class="no-map-data-container">
+                        <label class="no-map-data-label">Choose an enslaved person to view the family tree for the person.</label>
+                    </div>
+                    <div class="family-tree" id="graphMapWhatTree"></div>
+                </div>
+            </div>
+            <div id="right-positioning-containerTree" class="arrow-positioning-container stage-open">
+                <!--Button to move panel-->
+                <!--<div id="move-buttonTree" class="arrow-container">-->
+                    <!--<i id="rightButtonTree" class="fas fa-angle-right right-button"></i>-->
+                    <!--<i id="leftButtonTree" style="display: none" class="fas fa-angle-left right-button"></i>-->
+                <!--</div>-->
+            </div>
+            <div id="right-containerTree" class="right-container stage-open">
+                <label class="label-header larger-header">Filter Enslaved Persons</label>
+                <!-- SM: Added form row and column class to condense control grid -->
+                <div class="form-row">
+                    <div class="col">
+                        <!--Family-->
+                        <label class="label-header">Family:</label>
+                        <div class="filter-input-container">
+                            <input id="inputFamilyTree" style="flex-grow: 1" type="text" class="form-control form-control-sm typeahead" data-provide="typeahead">
+
+                            <!--<input id="inputFamilyTree" style="flex-grow: 1" type="text" class="form-control form-control-sm typeahead" data-provide="typeahead">-->
+                            <!--<input id="inputFamilyTree" style="flex-grow: 1" type="text" class="form-control form-control-sm typeahead" data-provide="typeahead">-->
+
+                            <!--<input id="inputFamilyTree" style="flex-grow: 1" type="text" class="form-control form-control-sm typeahead" data-provide="typeahead">-->
+                        </div>
+                        <!--<input id="inputFamilyTree" style="flex-grow: 1" type="text" class="form-control form-control-sm typeahead" data-provide="typeahead">-->
+
+                        <div class="sub-label" style="margin-top: -5px; display: block; margin-bottom: 5px">(Search for enslaved person and will filter to show people in that slave's family)</div>
+                    </div>
+                </div>
+
+                <!--Filter and Select Buttons-->
+                <div class="filter-input-container">
+                    <div style="flex-grow: 1"></div>
+                    <!--<input id="inputFamily" style="flex-grow: 1" type="text" class="form-control form-control-sm typeahead" data-provide="typeahead">-->
+                    <button id="resetButtonTree" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px; border-color: #181818" type="button" class="btn btn-sm btn-light">Reset</button>
+                    <button id="familyButtonTree" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px" type="button" class="btn btn-sm btn-primary">Filter</button>
+                </div>
+
+                <!--Person Selection Section-->
+                <div id="person-selection-containerTree">
+                    <label class="label-header larger-header" style="margin-top: 10px">Select Enslaved Person</label>
+
+                    <!--Enslaved Person-->
+                    <label class="label-header">Person:</label>
+                    <div class="filter-input-container">
+                        <input id="selectPersonTree" style="flex-grow: 1" type="text" class="form-control form-control-sm typeahead" data-provide="typeahead">
+                        <button id="selectButtonTree" style="flex-shrink: 1; flex-basis: 100px; margin-left: 10px" type="button" class="btn btn-sm btn-primary">Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="newVizPage" class="section">
-        <script src="//rawgit.com/FabricioRHS/skd3/master/build/sk.d3.min.js"></script>
+        <script src="./dependencies/sk.d3.js"></script>
         <link  href="//rawgit.com/FabricioRHS/skd3/master/build/sk.d3.min.css" rel="stylesheet" type="text/css" />
         <style>
             #sankeyChart {
-                height: 500px;
-                width: 960px;
+                height: 80VH;
+                width: 100VW;
+            }
+            /*#sankeyChart {*/
+                /*height: 500px;*/
+                /*width: 100VW;*/
+            /*}*/
+            .sk-svg {
+                display: block;
+                margin: auto;
             }
         </style>
 
@@ -607,7 +692,7 @@
 <script type="text/javascript" src="./js/routeMap.js"></script>
 <script type="text/javascript" src="./js/pathwaysMap.js"></script>
 <script type="text/javascript" src="./js/demographics.js"></script>
-<script type="text/javascript" src="./js/familyTree.js"></script>
+<!--<script type="text/javascript" src="./js/familyTree.js"></script>-->
 </body>
 </html>
 

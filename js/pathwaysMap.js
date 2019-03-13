@@ -154,6 +154,7 @@ function mapMain() {
             mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
 
             d3.select("#mapOtherLabel").classed("hidden-other-label", true);
+            d3.select("#mapOtherSourceLabel").classed("hidden-other-label", true); //hide warning messages
             d3.select('#noMapData').classed("hidden-other-label", false);
 
             plantationSelection.attr("class", function(d) {
@@ -167,7 +168,61 @@ function mapMain() {
             return;
         }
         else if (mapData.mapSourcePlantation === "" || mapData.mapDestinationPlantation === "") {
-            return;
+            // mapSVG.selectAll("#migrationPath").remove(); //remove old path between source and destination
+            // mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
+            //
+            // d3.select("#mapOtherLabel").classed("hidden-other-label", true);
+            // d3.select('#noMapData').classed("hidden-other-label", false);
+            //
+            // plantationSelection.attr("class", function(d) {
+            //     // if (d.name !== "GeorgetownUniversity" && d.name === mapSourcePlantation) {
+            //     //     return "plantation";
+            //     // }
+            //     // else {
+            //     return "not_plantation";
+            //     // }
+            // });
+            // return;
+            mapSourcePlantation = mapData.mapSourcePlantation;
+            mapDestinationPlantation = mapData.mapDestinationPlantation;
+            mapSVG.selectAll("#migrationPath").remove(); //remove old path between source and destination
+            mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
+            d3.select("#mapOtherLabel").classed("hidden-other-label", true); //hide warning messages
+            d3.select('#noMapData').classed("hidden-other-label", true);
+
+            if (mapData.mapSourcePlantation !== "") { //draw source if has one
+                plantationSelection.attr("class", function(d) {
+                    if (d.name !== "GeorgetownUniversity" && d.name === mapSourcePlantation) {
+                        return "plantation";
+                    }
+                    else {
+                        return "not_plantation";
+                    }
+                });
+                d3.select("#mapOtherLabel").classed("hidden-other-label", false);
+                d3.select("#mapOtherSourceLabel").classed("hidden-other-label", true); //hide warning messages
+                d3.select('#noMapData').classed("hidden-other-label", true);
+            }
+            else { //show warning messages for no source or destination
+                plantationSelection.attr("class", function(d) {
+                    if (mapDestinationPlantation === "HenryJohnson") { //Adjust names from buyers to plantation names
+                        mapDestinationPlantation = "ChathamPlantation";
+                    }
+                    else if (mapDestinationPlantation === "JesseBatey") {
+                        mapDestinationPlantation = "WestOakPlantation";
+                    }
+                    if (d.name !== "GeorgetownUniversity" && d.name === mapDestinationPlantation) {
+                        return "plantation";
+                    }
+                    else {
+                        return "not_plantation";
+                    }
+                });
+                d3.select("#mapOtherLabel").classed("hidden-other-label", true);
+                d3.select("#mapOtherSourceLabel").classed("hidden-other-label", false); //hide warning messages
+                d3.select('#noMapData').classed("hidden-other-label", true);
+            }
+            return
         }
         else {
             // console.log("d3Finished");
@@ -178,8 +233,9 @@ function mapMain() {
             mapSVG.selectAll("#migrationPath").remove(); //remove old path between source and destination
             mapSVG.selectAll("#migrationPathPortions").remove(); //remove multiple pieces used to construct path between source and destination
 
-            if (mapDestinationPlantation != null) {
+            if (mapDestinationPlantation !== null && mapDestinationPlantation !== "") {
                 d3.select("#mapOtherLabel").classed("hidden-other-label", true); //hide warning messages
+                d3.select("#mapOtherSourceLabel").classed("hidden-other-label", true); //hide warning messages
                 d3.select('#noMapData').classed("hidden-other-label", true);
 
                 var destination = plantationData.find(function (d) {
@@ -303,27 +359,27 @@ function mapMain() {
                 //bring plntation to front
                 plantationSelection.bringElementAsTopLayer();
             }
-            else { //desintation and source not both given
-                if (mapSourcePlantation) { //draw source if has one
-                    plantationSelection.attr("class", function(d) {
-                        if (d.name !== "GeorgetownUniversity" && d.name === mapSourcePlantation) {
-                            return "plantation";
-                        }
-                        else {
-                            return "not_plantation";
-                        }
-                    });
-                    d3.select("#mapOtherLabel").classed("hidden-other-label", false);
-                    d3.select('#noMapData').classed("hidden-other-label", true);
-                }
-                else { //show warning messages for no source or destination
-                    d3.select("#mapOtherLabel").classed("hidden-other-label", true);
-                    plantationSelection.attr("class", function(d) {
-                        return "not_plantation";
-                    });
-                    d3.select('#noMapData').classed("hidden-other-label", false);
-                }
-            }
+            // else { //desintation and source not both given
+            //     if (mapSourcePlantation) { //draw source if has one
+            //         plantationSelection.attr("class", function(d) {
+            //             if (d.name !== "GeorgetownUniversity" && d.name === mapSourcePlantation) {
+            //                 return "plantation";
+            //             }
+            //             else {
+            //                 return "not_plantation";
+            //             }
+            //         });
+            //         d3.select("#mapOtherLabel").classed("hidden-other-label", false);
+            //         d3.select('#noMapData').classed("hidden-other-label", true);
+            //     }
+            //     else { //show warning messages for no source or destination
+            //         d3.select("#mapOtherLabel").classed("hidden-other-label", true);
+            //         plantationSelection.attr("class", function(d) {
+            //             return "not_plantation";
+            //         });
+            //         d3.select('#noMapData').classed("hidden-other-label", false);
+            //     }
+            // }
         }
     };
 }

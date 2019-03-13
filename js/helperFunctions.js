@@ -11,6 +11,17 @@ function cleanDataLine(obj) { //sets origin and destination with cleaned data
     obj.destination = cleanName(obj.buyer_name);
     return obj;
 }
+function getSex(sexToConvert) {
+    if (sexToConvert === "M") {
+        return "male";
+    }
+    else if (sexToConvert === "F") {
+        return "female";
+    }
+    else {
+        return "unknown";
+    }
+}
 
 function csvJSON(csv){ //Convert CSV to JSON
     var lines = csv.split("\n");
@@ -52,6 +63,8 @@ function csvJSON(csv){ //Convert CSV to JSON
             initial_51: d["Initial 51"],
             katherine_jackson: d["Katherine Jackson"],
             ran_away: d["Ran away"],
+            height: d["Height (inches)"],
+            gender: getSex(d["Sex"]),
             extra_info: d["Notes"]
         }
     });
