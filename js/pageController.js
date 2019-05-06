@@ -32,7 +32,7 @@ function scrollToSection(type, id, action) {
 $(document).ready(function() {
     $('#fullpage').fullpage({
         sectionsColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'],
-        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'familyTreePage', 'sankeyPage', 'about'],
+        anchors: ['home', 'gu272History', 'gu272Passage','pathways', 'gu272Demographics', 'familyTreePage', 'routes', 'about'],
         menu: '#menu',
         scrollOverflow: true,
         autoScrolling: false,
@@ -82,7 +82,7 @@ $(document).scroll(function() {
         else if (y < $('#titlePage').height() + $('#historyPage').height() +
             $('#passagePage').height() + $('#pathwaysPage').height() + $('#demographicsPage').height() +
             $('#gu272familyTreesPage').height() + $('#newVizPage').height()) {
-            $('#heading-bar-subtitle').html("Sankey Visualization");
+            $('#heading-bar-subtitle').html("Routes");
         }
         else {
             $('#heading-bar-subtitle').html("About");

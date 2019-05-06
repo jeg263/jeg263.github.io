@@ -1,6 +1,6 @@
 $.ajax({
     type: "GET",
-    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSziKv8bLNEJRq0UgbAzYp5OJIYTwZXdXPEUX8VlDv0lzUAu4I_tLQVHmYob91BPUaYgCMZnF87mOSl/pub?gid=953071699&single=true&output=csv",
+    url: url.url,
     dataType: "text",
     success: function(data) {
         data = csvJSON(data);

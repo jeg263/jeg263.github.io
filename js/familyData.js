@@ -1,97 +1,23 @@
 var family = {familyData: null};
 
 function familyMain() {
-
-    function convertToTreeStructure(jsonStructureData, allPersonsFlat) {
-        var newStructure = [];
-        for (var i in jsonStructureData) {
-            var child = jsonStructureData[i];
-            var spouseObj = null;
-
-            if (child.spouse && child.spouse.length > 0) {
-                spouseObj = child.spouse[0];
-            }
-
-            if (child.children && child.children.length > 0) {
-                var spouse = null;
-                if (spouseObj) {
-                    spouse = {
-                        "name": spouseObj.first_name + " " + spouseObj.last_name,
-                        "class": "man",
-                        "id": spouseObj.id,
-                    };
-                }
-                else {
-                    spouse = {
-                        "name": "Unknown",
-                        "class": "woman"
-                    };
-                }
-
-                newStructure.push( {
-                    "name": child.first_name + " " + child.last_name,
-                    "textClass": "emphasis",
-                    "id": child.id,
-                    "class": "man",
-                    "marriages": [{
-                        "spouse": spouse,
-                        "children": convertToTreeStructure(child.children, allPersonsFlat)
-                    }]
-                })
-            }
-            else {
-                newStructure.push({
-                    "name": child.first_name + " " + child.last_name,
-                    "id": child.id,
-                    "class": "man"
-                });
-            }
-        }
-        return newStructure
-    }
-
     //process family data
     family.processFamilyData = function() {
         $.ajax({
             type: "GET",
-            url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSziKv8bLNEJRq0UgbAzYp5OJIYTwZXdXPEUX8VlDv0lzUAu4I_tLQVHmYob91BPUaYgCMZnF87mOSl/pub?gid=953071699&single=true&output=csv",
+            url: url.url,
             dataType: "text",
             success: function(gsaDataCSV) {
+                var superLocalData = csvComplexFamilyJSON(gsaDataCSV);
+
+                family.treeFamilyData = superLocalData;
+                refreshTreeViews(null, null, "");
+
                 var localFamilyData = csvFamilyJSON(gsaDataCSV);
                 localFamilyData = localFamilyData.map(function (p) { return flattenJSON(p) })
                 family.familyData = localFamilyData;
-
-                var secondLocalFamilyData = csvFamilyJSON(gsaDataCSV);
-                var jsonFamilyData = secondLocalFamilyData.filter(function (d) {
-                    if (d.children.length > 0)
-                        return true;
-                    return false;
-                });
-
-                // var newAllPersonData = csvJSON(gsaDataCSV);
-                var newParents = convertToTreeStructure(jsonFamilyData, csvJSON(gsaDataCSV));
-                family.treeFamilyData = newParents;
-                updateTree();
             }
         });
-
-        // $.getJSON("./data/gsaDataFile.json", function (allPeopleJSON) {
-        //     var localFamilyData = csvFamilyJSON(gsaDataCSV);
-        //     localFamilyData = localFamilyData.map(function (p) { return flattenJSON(p) })
-        //     family.familyData = localFamilyData;
-        //
-        //     var secondLocalFamilyData = csvFamilyJSON(gsaDataCSV);
-        //     var jsonFamilyData = secondLocalFamilyData.filter(function (d) {
-        //         if (d.children.length > 0)
-        //             return true;
-        //         return false;
-        //     });
-        //
-        //     // var newAllPersonData = csvJSON(gsaDataCSV);
-        //     var newParents = convertToTreeStructure(jsonFamilyData, csvJSON(gsaDataCSV));
-        //     family.treeFamilyData = newParents;
-        //     updateTree();
-        // });
     };
     family.findFamilySetForId = function(id) {  //find family with person of id
         for (var i = 0 in family.familyData) { //loop through every family set in the array of familyData
@@ -135,174 +61,6 @@ function familyMain() {
                 return [json.id]; //just one id
         }
     }
-}
-function updateTreeWithSelectedClass(person, personObj, treeObj, selectedClass) {
-    var treeDiv = d3.select('#graphMapWhat');
-    if (treeDiv) //doesn't run the first time the visualization is created
-        treeDiv.selectAll("*").remove();
-
-    // var newParents = [{
-    //     "name": "none",
-    //     "textClass": "emphasis",
-    //     "id": "1",
-    //     "class": "man",
-    //     "marriages": []
-    // }];
-    var newParents = null;
-    if (person) {
-
-        // newParents = [family.treeFamilyData[1]];
-        if (personObj)
-            newParents = [{
-                "name": personObj.first_name + " " + personObj.last_name,
-                "textClass": "emphasis",
-                "id": personObj.id,
-                "class": selectedClass,
-                "marriages": []
-            }];
-        else if (treeObj) {
-            newParents = [{
-                "name": personObj.name,
-                "textClass": "emphasis",
-                "id": personObj.id,
-                "class": selectedClass,
-                "marriages": []
-            }];
-        }
-
-        function searchTree(id, node) {
-            if (node.id === "" + id)
-                return true;
-            else {
-                var combinedConditional = false;
-                if (node.marriages && node.marriages.length > 0) {
-                    if (node.marriages[0].spouse.id === "" + id)
-                        return true;
-                    else {
-                        if (node.marriages[0].children && node.marriages[0].children.length > 0) {
-                            for (var c in node.marriages[0].children) {
-                                combinedConditional = combinedConditional || searchTree(id, node.marriages[0].children[c])
-                                if (combinedConditional)
-                                    return combinedConditional
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-        }
-        for (var j in family.treeFamilyData) {
-            if (searchTree(person, family.treeFamilyData[j]))
-            {
-                newParents = [family.treeFamilyData[j]];
-                break;
-            }
-        }
-    }
-    // newParents = [family.treeFamilyData[1]];
-
-    // if (newParents && newParents.length > 0)
-    //     newParents = newParents[0];
-    for (var par in newParents) {
-        function getLongestParent(parent) {
-            if (parent.marriages && parent.marriages.length > 0) {
-                var lengthsArray = [];
-                var children = parent.marriages[0].children;
-
-                if (children.length > 0) {
-                    for (var childI in children) {
-                        var child = children[childI];
-                        var childLength = 1 + getLongestParent(child);
-                        lengthsArray.push(childLength);
-                    }
-                    return lengthsArray.reduce(function (a, b) {
-                        return Math.max(a, b);
-                    });
-                }
-                else {
-                    return 1;
-                }
-            }
-            else {
-                return 1;
-            }
-        }
-
-        function getEdgeNodes(parent) {
-            if (parent.marriages && parent.marriages.length > 0) {
-                var lengthsArray = [];
-                var children = parent.marriages[0].children;
-
-                if (children.length > 0) {
-                    var childrenCounter = 0;
-                    for (var childI in children) {
-                        var child = children[childI];
-                        childrenCounter += getEdgeNodes(child);
-                    }
-                    return childrenCounter;
-                }
-                else {
-                    return 1;
-                }
-            }
-            else {
-                return 1;
-            }
-        }
-
-        var len = getLongestParent(newParents[par]);
-        var count = getEdgeNodes(newParents[par]);
-
-        if (count === 0)
-            count = 1;
-
-        var hundredMultiplier = Math.ceil(count / 4) * 155;
-        var widthFinal = 0;
-
-        if (len === 0) {
-            widthFinal = 100;
-        }
-        else {
-            widthFinal = 100 * (2 * len - 1)
-        }
-
-        var treeData = newParents[par];
-        if (person && selectedClass !== "man")
-            treeData = setColorToSelected(newParents[par], person);
-        else if (person)
-            resetColors(newParents[par], person);
-
-
-        var familyName = personObj.last_name;
-        if (familyName === "")
-            familyName = "Unknown";
-
-        dTree.init([treeData, familyName], {
-            target: "#graphMapWhat",
-            debug: true,
-            height: hundredMultiplier,
-            width: widthFinal,
-            nodeWidth: 150,
-            callbacks: {
-                nodeClick: function (clickedData, extra) {
-                    // controller.selectEnslavedPerson()
-                    if (clickedData.class === "man")
-                        didSelectTreeNodeWith(clickedData.id);
-                    // if (clickedData.class === "man")
-                    //     updateTree(clickedData.id, null, clickedData);
-                },
-                textRenderer: function (name, extra, textClass) {
-                    if (extra && extra.nickname)
-                        name = name + " (" + extra.nickname + ")";
-                    return "<p align='center' class='" + textClass + "'>" + name + "</p>";
-                }
-            }
-        });
-        break;
-    }
-}
-function updateTree(person, personObj, treeObj) {
-    updateTreeWithSelectedClass(person, personObj, treeObj, "selected-man");
 }
 function setColorToSelected(tree, person) {
 
@@ -424,11 +182,165 @@ function didSelectTreeNodeWith(id) {
     else
         controller.deselectEnslavedPerson(); //if person doesn't exist deselect
 }
-family.refreshTreeWIthSelectedPerson = function(familyData, familyRefresh) {
-
-    if (familyData) {
+function refreshTreeViews(newParents, person, selectedClass) {
+    if (newParents && newParents.length > 0) {
         d3.select('#noTreeData').classed("hidden-other-label", true);
-        var idEnd = familyData.id;
+    }
+    else {
+        d3.select('#noTreeData').classed("hidden-other-label", false);
+    }
+
+    for (var par in newParents) {
+        function getLongestParent(parent) {
+            if (parent.marriages && parent.marriages.length > 0) {
+                var lengthsArray = [];
+                var children = parent.marriages[0].children;
+
+                if (children.length > 0) {
+                    for (var childI in children) {
+                        var child = children[childI];
+                        var childLength = 1 + getLongestParent(child);
+                        lengthsArray.push(childLength);
+                    }
+                    return lengthsArray.reduce(function (a, b) {
+                        return Math.max(a, b);
+                    });
+                }
+                else {
+                    return 1;
+                }
+            }
+            else {
+                return 1;
+            }
+        }
+
+        function getEdgeNodes(parent) {
+            if (parent.marriages && parent.marriages.length > 0) {
+                var lengthsArray = [];
+                var children = parent.marriages[0].children;
+
+                if (children.length > 0) {
+                    var childrenCounter = 0;
+                    for (var childI in children) {
+                        var child = children[childI];
+                        childrenCounter += getEdgeNodes(child);
+                    }
+                    return childrenCounter;
+                }
+                else {
+                    return 1;
+                }
+            }
+            else {
+                return 1;
+            }
+        }
+
+        var len = getLongestParent(newParents[par]);
+        var count = getEdgeNodes(newParents[par]);
+
+        if (count === 0)
+            count = 1;
+
+        var hundredMultiplier = Math.ceil(count / 4) * 155 - 75;
+        var widthFinal = 0;
+
+        if (len === 0) {
+            widthFinal = 100;
+        }
+        else {
+            widthFinal = 100 * (2 * len - 1)
+        }
+
+        var treeData = newParents[par];
+        if (person && selectedClass !== "man")
+            treeData = setColorToSelected(newParents[par], person);
+        else if (person)
+            resetColors(newParents[par], person);
+        else
+            resetColors(newParents[par], "");
+
+
+        var familyName = "";
+
+        dTree.init([treeData, familyName], {
+            target: "#graphMapWhat",
+            debug: true,
+            height: hundredMultiplier,
+            width: widthFinal,
+            nodeWidth: 150,
+            callbacks: {
+                nodeClick: function (clickedData, extra) {
+                    // controller.selectEnslavedPerson()
+                    if (clickedData.class === "man")
+                        if (clickedData.identifier && clickedData.identifier !== "")
+                            didSelectTreeNodeWith(parseInt(clickedData.identifier));
+                    // if (clickedData.class === "man")
+                    //     updateTree(clickedData.id, null, clickedData);
+                },
+                textRenderer: function (name, extra, textClass) {
+                    if (extra && extra.nickname)
+                        name = name + " (" + extra.nickname + ")";
+                    return "<p align='center' class='" + textClass + "'>" + name + "</p>";
+                }
+            }
+        });
+    }
+}
+family.refreshTreeFromLastName = function (searchTerm, person, familyRefresh) {
+    let selectedClass = "selected-man";
+    if (familyRefresh)
+        selectedClass = "man";
+
+    if (searchTerm === "" && person !== null) {
+        refreshComplexTreeFromSelectedPerson(person, selectedClass)
+    }
+    else if (searchTerm === "" && person === null) {
+        var treeDiv = d3.select('#graphMapWhat');
+        if (treeDiv) //doesn't run the first time the visualization is created
+            treeDiv.selectAll("*").remove();
+
+        refreshTreeViews(null, person)
+    }
+    else {
+        var treeDiv = d3.select('#graphMapWhat');
+        if (treeDiv) //doesn't run the first time the visualization is created
+            treeDiv.selectAll("*").remove();
+
+        function searchTree(lastName, node) {
+            if (node.last_name === "" + lastName)
+                return true;
+            else {
+                var combinedConditional = false;
+                if (node.marriages && node.marriages.length > 0) {
+                    if (node.marriages[0].spouse.last_name === "" + lastName)
+                        return true;
+                    else {
+                        if (node.marriages[0].children && node.marriages[0].children.length > 0) {
+                            for (var c in node.marriages[0].children) {
+                                combinedConditional = combinedConditional || searchTree(lastName, node.marriages[0].children[c])
+                                if (combinedConditional)
+                                    return combinedConditional
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+        let newParents = [];
+
+        for (var j in family2.treeFamilyData) {
+            if (searchTree(searchTerm, family2.treeFamilyData[j]))
+            {
+                newParents.push(family2.treeFamilyData[j]);
+            }
+        }
+        refreshTreeViews(newParents, person, selectedClass)
+    }
+    function refreshComplexTreeFromSelectedPerson(person, selectedClass) {
+        var idEnd = person;
         var newID = "";
         for (var i = 0; i < idEnd.length; i++) {
             var g = idEnd[i];
@@ -437,14 +349,44 @@ family.refreshTreeWIthSelectedPerson = function(familyData, familyRefresh) {
                 newID += q;
             }
         }
-        if (familyRefresh)
-            updateTreeWithSelectedClass(parseFloat(newID), familyData, null, "man");
-        else
-            updateTree(parseFloat(newID), familyData);
-    }
-    else {
-        d3.select('#noTreeData').classed("hidden-other-label", false);
-        updateTree()
+        person = newID;
+
+
+        var treeDiv = d3.select('#graphMapWhat');
+        if (treeDiv) //doesn't run the first time the visualization is created
+            treeDiv.selectAll("*").remove();
+
+        function searchTree(id, node) {
+            if (node.id === "" + id)
+                return true;
+            else {
+                var combinedConditional = false;
+                if (node.marriages && node.marriages.length > 0) {
+                    if (node.marriages[0].spouse.id === "" + id)
+                        return true;
+                    else {
+                        if (node.marriages[0].children && node.marriages[0].children.length > 0) {
+                            for (var c in node.marriages[0].children) {
+                                combinedConditional = combinedConditional || searchTree(id, node.marriages[0].children[c])
+                                if (combinedConditional)
+                                    return combinedConditional
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
+        let newParents = [];
+
+        for (var j in family2.treeFamilyData) {
+            if (searchTree(person, family2.treeFamilyData[j]))
+            {
+                newParents.push(family2.treeFamilyData[j]);
+            }
+        }
+        refreshTreeViews(newParents, person, selectedClass)
     }
 };
 family.refreshTreeWText = function() {

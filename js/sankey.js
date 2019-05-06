@@ -176,7 +176,7 @@ function buildSankey() {
             {id: 6, name: "Initial 51", color: "brown"},
             {id: 7, name: "Chatham", color: "#FF8000"},
             {id: 8, name: "West Oak", color: "#53B447"},
-            {id: 9, name: "Other Buyer", color: "#7A3DD8"},
+            {id: 9, name: "Other Plantation", color: "#7A3DD8"},
             {id: 10, name: "Ran away", color: "#fede28"},
             {id: 11, name: "Never Ran away", color: "#fede28"}
         ],
@@ -190,7 +190,7 @@ function buildSankey() {
 
         $.ajax({
             type: "GET",
-            url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSziKv8bLNEJRq0UgbAzYp5OJIYTwZXdXPEUX8VlDv0lzUAu4I_tLQVHmYob91BPUaYgCMZnF87mOSl/pub?gid=953071699&single=true&output=csv",
+            url: url.url,
             dataType: "text",
             success: function(data) {
                 //Set original data

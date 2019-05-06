@@ -86,6 +86,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var nodeSize = this.nodeSize;
 
                 var width = opts.width + opts.margin.left + opts.margin.right;
+
                 var height = opts.height + opts.margin.top + opts.margin.bottom;
 
                 //make an SVG
@@ -486,6 +487,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var node = {
                     name: person.name,
                     id: id++,
+                    identifier: person.id,
                     hidden: false,
                     children: [],
                     extra: person.extra,
@@ -545,6 +547,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         spouse = {
                             name: sp.name,
                             id: id++,
+                            identifier: sp.id,
                             hidden: false,
                             noParent: true,
                             children: [],

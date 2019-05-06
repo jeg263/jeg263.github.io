@@ -33,33 +33,23 @@ function controllerMain() {
             chord.refreshVisualization(combinedFilter); //refresh visualization using filter
             updateFilterConditionsForSelect(); //Update filter conditions
             if (familySearchTerm) {
-                var personData = chord.getAllData().filter(function(data) { //find selected person
-                    if (data.data.last_name === familySearchTerm)
-                        return true;
-                    return false;
-                });
-                if (personData && personData.length > 0) {
-                    var indexOfPersonToFilter = 0;
-
-                    for (i = 0; i < personData.length; i++) {
-                        if (personData[i].data.father_id !== "" || personData[i].data.mother_id !== "") {
-                            indexOfPersonToFilter = i;
-                            break;
-                        }
-                    }
-                    family.refreshTreeWIthSelectedPerson(personData[indexOfPersonToFilter].data, true);
-                }
-                    // controller.selectEnslavedPerson(personData[0].data); //select person
-                // // if (enjoyhint_instance)
-                // //     enjoyhint_instance.trigger('next');
-                // var name = personData.full_name.substr(personData.full_name.indexOf(" ") + 1); //get persons name to set to text of input
-                // selectPersonSearchTerm = name;
-                // $("#selectPerson").val(name);
-                // mapData.mapDestinationPlantation = personData.destination; //get data based on selection
-                // mapData.mapSourcePlantation = personData.origin;
-                // mapData.updateMap(); //update map
-                // chord.selectNodeWithData(personData); //update roots wheel
-                // family.refreshTreeWIthSelectedPerson(personData);
+                family.refreshTreeFromLastName(familySearchTerm, null, true);
+                // var personData = chord.getAllData().filter(function(data) { //find selected person
+                //     if (data.data.last_name === familySearchTerm)
+                //         return true;
+                //     return false;
+                // });
+                // if (personData && personData.length > 0) {
+                //     var indexOfPersonToFilter = 0;
+                //
+                //     for (i = 0; i < personData.length; i++) {
+                //         if (personData[i].data.father_id !== "" || personData[i].data.mother_id !== "") {
+                //             indexOfPersonToFilter = i;
+                //             break;
+                //         }
+                //     }
+                //     // family.refreshTreeWIthSelectedPerson(personData[indexOfPersonToFilter].data, true);
+                // }
             }
         });
         $("#chordSelector").change(function(result){ //if chaning to root wheel display it
@@ -395,7 +385,7 @@ function controllerMain() {
         mapData.mapSourcePlantation = personData.origin;
         mapData.updateMap(); //update map
         chord.selectNodeWithData(personData); //update roots wheel
-        family.refreshTreeWIthSelectedPerson(personData);
+        family.refreshTreeFromLastName("", personData.id);
     };
     controller.deselectEnslavedPerson = function() {
         $("#selectPerson").val(""); //undo all data and update visualizations
@@ -403,7 +393,7 @@ function controllerMain() {
         mapData.mapSourcePlantation = "";
         mapData.updateMap();
         chord.deselectAllNodes();
-        family.refreshTreeWIthSelectedPerson(null);
+        family.refreshTreeFromLastName("", null);
     };
     controller.didUpdateMultiplier = function () { //on multiplier change change slider value to keep in line with actual multiplier
         $(document).ready(function() {
